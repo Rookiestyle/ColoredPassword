@@ -313,6 +313,7 @@ namespace ColoredPassword
 			o.cbColorEntryView.Checked = ColorConfig.ColorEntryView;
 			o.cbColorEntryViewKeepBackgroundColor.Checked = ColorConfig.ListViewKeepBackgroundColor;
 			o.lError.Visible = !ColoredPasswordExt.OverridePossible;
+			o.ctbExample.ColorText();
 			ColorConfig.Testmode = true;
 		}
 

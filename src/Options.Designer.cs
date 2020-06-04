@@ -380,7 +380,7 @@
 		private System.Windows.Forms.Panel pColorEntryView;
 		private System.Windows.Forms.Label lError2;
 		internal System.Windows.Forms.Label lError;
-		private ColorTextBox ctbExample;
+		internal ColorTextBox ctbExample;
 		internal System.Windows.Forms.CheckBox cbColorEntryView;
 		internal System.Windows.Forms.CheckBox cbColorEntryViewKeepBackgroundColor;
 		private System.Windows.Forms.TableLayoutPanel tlp;

@@ -10,7 +10,6 @@ namespace ColoredPassword
 		public Options()
 		{
 			InitializeComponent();
-			ctbExample.ColorText();
 			bForeColorDefault.Text = string.Empty;
 			bBackColorDefault.Text = string.Empty;
 			bForeColorLower.Text = string.Empty;

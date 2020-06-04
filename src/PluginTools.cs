@@ -706,7 +706,22 @@ namespace PluginTools
 			if (m_DebugEntries.Count == 0) return;
 			SaveDebugMessages();
 			if (AutoOpen || (AskOpen && Tools.AskYesNo("DebugFile: " + DebugFile + "\n\nOpen debug file?") == DialogResult.Yes))
-				System.Diagnostics.Process.Start(DebugFile);
+			{
+				try
+				{
+					System.Diagnostics.Process.Start(DebugFile);
+				}
+				catch
+				{
+					if (KeePassLib.Native.NativeLib.IsUnix()) //The above is broken on mono
+					{
+						System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo();
+						psi.Arguments = DebugFile;
+						psi.FileName = "xdg-open";
+						System.Diagnostics.Process.Start(psi);
+					}
+				}
+			}
 		}
 
 		private static System.Xml.XmlWriter m_xw = null;
