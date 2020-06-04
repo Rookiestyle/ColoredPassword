@@ -15,6 +15,24 @@ namespace ColoredPassword
 		Special,
 		Lowercase
 	}
+
+	public class CharRange
+	{
+		public CharacterRange Range;
+		public CharType CharType;
+
+		public CharRange()
+		{
+			Range = new CharacterRange();
+		}
+
+#if DEBUG
+		public override string ToString()
+		{
+			return CharType.ToString() + ": " + Range.First.ToString() + " - " + Range.Length.ToString();
+		}
+#endif
+	}
 	internal sealed class ColoredSecureTextBox : SecureTextBoxEx
 	{
 		private ColorTextBox m_text = null;
@@ -183,6 +201,7 @@ namespace ColoredPassword
 				m_text.TextChanged += ColorTextChanged;
 				if (m_bKeeTheme) m_text.Parent.BringToFront();
 				else m_text.BringToFront();
+				if (KeePassLib.Native.NativeLib.IsUnix()) m_text.ColorText();
 			}
 		}
 
@@ -262,12 +281,12 @@ namespace ColoredPassword
 			this.Text = strPre + strData + strPost;
 		}
 
-		public static List<CharacterRange> GetRanges(string s)
+		public static List<CharRange> GetRanges(string s)
 		{
-			List<CharacterRange> lCR = new List<CharacterRange>();
+			List<CharRange> lCR = new List<CharRange>();
 			if (string.IsNullOrEmpty(s)) return lCR;
 			CharType ctPrev = CharType.Unkown;
-			CharacterRange cr = new CharacterRange();
+			CharRange cr = new CharRange();
 			int i = 0;
 			while (i < s.Length)
 			{
@@ -278,11 +297,13 @@ namespace ColoredPassword
 				bool bNewCR = (ctPrev == CharType.Unkown) || ctPrev != ctCur;
 				if (bNewCR)
 				{
-					if (ctPrev != CharType.Unkown) lCR.Add(cr);
-					cr = new CharacterRange();
-					cr.First = i;
+					if (ctPrev != CharType.Unkown)
+						lCR.Add(cr);
+					cr = new CharRange();
+					cr.CharType = ctCur;
+					cr.Range.First = i;
 				}
-				cr.Length = cr.Length + 1;
+				cr.Range.Length++;
 				ctPrev = ctCur;
 				i++;
 			}
@@ -292,40 +313,45 @@ namespace ColoredPassword
 
 		public void ColorText()
 		{
-			PluginDebug.AddInfo(Name + " Color password");
-			int nCursorPos = this.SelectionStart; //save cursor position
-			this.SelectAll();
-			this.Select(nCursorPos, 0); //restore cursor position
+			int nCursorPos = SelectionStart; //save cursor position
+			SelectAll();
 
-			List<CharacterRange> lCR = GetRanges(this.Text);
+			List<CharRange> lCR = GetRanges(this.Text);
+			List<string> lMsg = new List<string>();
+			bool bError = false;
 			foreach (var cr in lCR)
 			{
-				this.Select(cr.First, cr.Length);
-				if (char.IsDigit(this.SelectedText, 0))
+				lMsg.Add(cr.ToString());
+				Select(cr.Range.First, cr.Range.Length);
+				switch (cr.CharType)
 				{
-					this.SelectionColor = ColorConfig.ForeColorDigit;
-					this.SelectionBackColor = ColorConfig.BackColorDigit;
-				}
-				else if (char.IsLetter(this.SelectedText, 0))
-				{
-					if (ColorConfig.LowercaseDifferent && char.IsLower(this.SelectedText, 0))
-					{
-						this.SelectionColor = ColorConfig.ForeColorLower;
-						this.SelectionBackColor = ColorConfig.BackColorLower;
-					}
-					else
-					{
-						this.SelectionColor = ColorConfig.ForeColorDefault;
-						this.SelectionBackColor = ColorConfig.BackColorDefault;
-					}
-				}
-				else
-				{
-					this.SelectionColor = ColorConfig.ForeColorSpecial;
-					this.SelectionBackColor = ColorConfig.BackColorSpecial;
+					case CharType.Digit:
+						SelectionColor = ColorConfig.ForeColorDigit;
+						SelectionBackColor = ColorConfig.BackColorDigit;
+						break;
+					case CharType.Letter:
+						SelectionColor = ColorConfig.ForeColorDefault;
+						SelectionBackColor = ColorConfig.BackColorDefault;
+						break;
+					case CharType.Lowercase:
+						SelectionColor = ColorConfig.ForeColorLower;
+						SelectionBackColor = ColorConfig.BackColorLower;
+						break;
+					case CharType.Special:
+						SelectionColor = ColorConfig.ForeColorSpecial;
+						SelectionBackColor = ColorConfig.BackColorSpecial;
+						break;
+					default:
+						lMsg[lMsg.Count - 1] += " unknown character type";
+						bError = true;
+						continue;
 				}
 			}
-			this.Select(nCursorPos, 0); //restore cursor position
+
+			if (bError) PluginDebug.AddInfo(Name + " Color password", 0, lMsg.ToArray());
+			else PluginDebug.AddInfo(Name + " Color password", 0, lMsg.ToArray());
+
+			Select(nCursorPos, 0); //restore cursor position
 		}
 
 		private void ContextMenuStrip_Opening(object sender, EventArgs e)
