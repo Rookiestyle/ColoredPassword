@@ -108,9 +108,11 @@ namespace ColoredPassword
 			ColorPasswords(ColorConfig.Active);
 		}
 
+		private Color m_cBackgroundColor = Color.White;
 		private void Lv_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
 		{
 			e.DrawDefault = true;
+			m_cBackgroundColor = UIUtil.GetAlternateColorEx(e.Header.ListView.BackColor);
 		}
 
 		private void Lv_DrawItem(object sender, DrawListViewItemEventArgs e)
@@ -136,14 +138,9 @@ namespace ColoredPassword
 			{
 				//Let the OS draw in case no other handlers exist
 				//If other handlers exist, we pass their value for DrawDefault
-				if (m_OtherHandlers["DrawItem"].Count == 0)
-					e.DrawDefault = true;
-				if (colPw == null)
-				{
-					m = "Password column not found";
-				}
-				else
-					m = "Password column found, password hidden";
+				if (m_OtherHandlers["DrawItem"].Count == 0) e.DrawDefault = true;
+				if (colPw == null) m = "Password column not found";
+				else m = "Password column found, password hidden";
 				List<string> lCol = new List<string>();
 				foreach (var c in KeePass.Program.Config.MainWindow.EntryListColumns)
 					lCol.Add(c.GetDisplayName());
@@ -160,64 +157,53 @@ namespace ColoredPassword
 
 		private void Lv_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
 		{
-			//Setting e.DrawDefault = true for all columns beside the password column
-			//does not work. Alternating background color is not shown
-			//unless e.Graphics.FillRectangle is called
-			//
-			//Only exception is the title column which shows the entry's icon
+			/* Only draw password column
+			 * 
+			 * Just setting e.DrawDefault = true for other columns is not sufficient
+			 * Explicitly specify alternating backround color
+			 * Explicitly specify strikeout for expired entries
+			 * This will not be shown otherwise
+			*/
 			if (e.Header.Text != KeePass.Resources.KPRes.Password)
 			{
-				if (!KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors ||
-				(e.Header.Text == KeePass.Resources.KPRes.Title))
+				string m = "m_lvEntries: Skip column '" + e.Header.Text + "'";
+				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
+				if (!KeePassLib.Native.NativeLib.IsUnix())
 				{
-					string m = "m_lvEntries: Skip column '" + e.Header.Text + "'";
-					if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
-						PluginDebug.AddInfo(m, 0);
-					Font f = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
-					bool DrawDefault = e.Header.Text == KeePass.Resources.KPRes.Title;
-					if (!DrawDefault)
+					PwListItem pli = e.Item.Tag as PwListItem;
+					bool bExpired = (pli == null) || (pli.Entry == null) || (pli.Entry.Expires && pli.Entry.ExpiryTime < DateTime.UtcNow);
+					if (KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors && ((e.ItemIndex & 1) == 1))
 					{
-						//Use default drawing if entry is not expired, otherwise the strikeout is not drawn
-						KeePassLib.PwEntry pe = (e.Item.Tag as PwListItem).Entry;
-						if (pe == null)
-							DrawDefault = true;
-						else
-							DrawDefault = !pe.Expires || (pe.ExpiryTime >= DateTime.UtcNow);
+						if (e.Item.UseItemStyleForSubItems) e.SubItem.BackColor = m_cBackgroundColor;
+						else e.Item.BackColor = m_cBackgroundColor;
 					}
-					if (DrawDefault)
+					if (bExpired)
 					{
-						e.DrawDefault = true;
-						return;
+						if (e.Item.UseItemStyleForSubItems) e.SubItem.Font = new Font(e.SubItem.Font, e.SubItem.Font.Style | FontStyle.Strikeout);
+						else e.Item.Font = new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout);
 					}
 				}
+				e.DrawDefault = true;
+				return;
 			}
 			Color cItemForeground = e.Item.UseItemStyleForSubItems ? e.Item.ForeColor : e.SubItem.ForeColor;
 			Color cItemBackground = e.Item.UseItemStyleForSubItems ? e.Item.BackColor : e.SubItem.BackColor;
 			if (KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors && ((e.ItemIndex & 1) == 1))
-				cItemBackground = UIUtil.GetAlternateColorEx(m_lvEntries.BackColor);
+				cItemBackground = m_cBackgroundColor;
 			Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
 			if (!e.Item.Selected)
 				e.Graphics.FillRectangle(new SolidBrush(cItemBackground), e.Bounds);
-			if (e.Header.Text != KeePass.Resources.KPRes.Password)
-			{
-				string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
-				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
-					PluginDebug.AddInfo(m, 0);
-				StringFormat sf = StringFormat.GenericDefault;
-				sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
-				sf.Trimming = StringTrimming.EllipsisCharacter;
-				Rectangle r = new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
-				e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
-				return;
-			}
+			int iPadding = 3;
+			int iPaddingY = 2;
 			string msg = "m_lvEntries: Handle password column '" + e.Header.Text + "' - Start";
-			PluginDebug.AddInfo(msg);
+			PluginDebug.AddInfo(msg, 0);
 			string s = e.SubItem.Text;
-			float x = e.Bounds.X + 3;
+			float x = e.Bounds.X + iPadding;
 			int i = 0;
 			while (i < s.Length)
 			{
 				StringFormat sf = StringFormat.GenericTypographic;
+				//Measuring only the to be drawn character produces wrong results
 				float fWidth = e.Graphics.MeasureString("A!r" + s.Substring(i, 1), fFont, int.MaxValue, sf).Width;
 				fWidth -= e.Graphics.MeasureString("A!r", fFont, int.MaxValue, sf).Width;
 				if ((e.Bounds.X + e.Bounds.Width) <= (x + fWidth)) break;
@@ -251,7 +237,7 @@ namespace ColoredPassword
 				lMsg.Add("Foreground: " + col.ToString());
 				lMsg.Add("Background: " + colb.ToString());
 				PluginDebug.AddInfo(msg, 0, lMsg.ToArray());
-				RectangleF r = new RectangleF(x, e.Bounds.Y, fWidth, e.Bounds.Height);
+				RectangleF r = new RectangleF(x, e.Bounds.Y + iPaddingY, fWidth, e.Bounds.Height - (2 * iPaddingY));
 				e.Graphics.FillRectangle(new SolidBrush(colb), r);
 				e.Graphics.DrawString(s.Substring(i, 1), fFont, new SolidBrush(col), r, sf);
 				x += fWidth;
@@ -427,6 +413,7 @@ namespace ColoredPassword
 			Tools.OptionsFormClosed -= OptionsClosed;
 			m_host.MainWindow.ToolsMenu.DropDownItems.Remove(m_menu);
 			m_menu.Dispose();
+			GlobalWindowManager.WindowAdded -= OnKeyPromptFormLoad;
 
 			ColorPasswords(false);
 			PluginDebug.SaveOrShow();

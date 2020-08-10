@@ -33,6 +33,7 @@ namespace ColoredPassword
 		}
 #endif
 	}
+
 	internal sealed class ColoredSecureTextBox : SecureTextBoxEx
 	{
 		private ColorTextBox m_text = null;
@@ -348,7 +349,7 @@ namespace ColoredPassword
 				}
 			}
 
-			if (bError) PluginDebug.AddInfo(Name + " Color password", 0, lMsg.ToArray());
+			if (bError) PluginDebug.AddError(Name + " Color password", 0, lMsg.ToArray());
 			else PluginDebug.AddInfo(Name + " Color password", 0, lMsg.ToArray());
 
 			Select(nCursorPos, 0); //restore cursor position

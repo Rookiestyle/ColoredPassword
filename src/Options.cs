@@ -31,7 +31,7 @@ namespace ColoredPassword
 			gExample.Text = PluginTranslate.Example;
 
 			lError.Text = string.Format(PluginTranslate.Error, typeof(KeePass.UI.SecureTextBoxEx).BaseType.Name);
-
+			
 			lError2.Visible = !KeePass.App.AppPolicy.Current.UnhidePasswords;
 			lError2.Text = KeePass.Resources.KPRes.PolicyRequiredFlag + ": " + KeePass.Resources.KPRes.UnhidePasswords; ;
 		}
@@ -59,6 +59,7 @@ namespace ColoredPassword
 			w = Math.Min(w, tlp.ClientSize.Width / 3);
 			tlp.ColumnStyles[1].SizeType = tlp.ColumnStyles[2].SizeType = SizeType.Absolute;
 			tlp.ColumnStyles[1].Width = tlp.ColumnStyles[2].Width = w;
+			pError.Visible = lError.Visible || lError2.Visible;
 		}
 
 		private void cbLowercase_CheckedChanged(object sender, EventArgs e)
