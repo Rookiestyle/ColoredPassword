@@ -157,44 +157,38 @@ namespace ColoredPassword
 
 		private void Lv_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
 		{
-			/* Only draw password column
-			 * 
-			 * Just setting e.DrawDefault = true for other columns is not sufficient
-			 * Explicitly specify alternating backround color
-			 * Explicitly specify strikeout for expired entries
-			 * This will not be shown otherwise
+			/* Do not handle first column
+			 * First column references the ListView item and can/has to be drawn by the OS
 			*/
-			if (e.Header.Text != KeePass.Resources.KPRes.Password)
+			if (e.ColumnIndex == 0)
 			{
-				string m = "m_lvEntries: Skip column '" + e.Header.Text + "'";
-				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
-				if (!KeePassLib.Native.NativeLib.IsUnix())
-				{
-					PwListItem pli = e.Item.Tag as PwListItem;
-					bool bExpired = (pli == null) || (pli.Entry == null) || (pli.Entry.Expires && pli.Entry.ExpiryTime < DateTime.UtcNow);
-					if (KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors && ((e.ItemIndex & 1) == 1))
-					{
-						if (e.Item.UseItemStyleForSubItems) e.SubItem.BackColor = m_cBackgroundColor;
-						else e.Item.BackColor = m_cBackgroundColor;
-					}
-					if (bExpired)
-					{
-						if (e.Item.UseItemStyleForSubItems) e.SubItem.Font = new Font(e.SubItem.Font, e.SubItem.Font.Style | FontStyle.Strikeout);
-						else e.Item.Font = new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout);
-					}
-				}
 				e.DrawDefault = true;
 				return;
 			}
 			Color cItemForeground = e.Item.UseItemStyleForSubItems ? e.Item.ForeColor : e.SubItem.ForeColor;
 			Color cItemBackground = e.Item.UseItemStyleForSubItems ? e.Item.BackColor : e.SubItem.BackColor;
 			if (KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors && ((e.ItemIndex & 1) == 1))
-				cItemBackground = m_cBackgroundColor;
+			{
+				//Only set defined alternate background color, if the default background color was not changed yet
+				//This way, explicitly set background colors do have higher priority
+				if (cItemBackground == e.Item.ListView.BackColor) cItemBackground = m_cBackgroundColor;
+			}
 			Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
-			if (!e.Item.Selected)
-				e.Graphics.FillRectangle(new SolidBrush(cItemBackground), e.Bounds);
+			if (!e.Item.Selected) e.Graphics.FillRectangle(new SolidBrush(cItemBackground), e.Bounds);
 			int iPadding = 3;
 			int iPaddingY = 2;
+			if (e.Header.Text != KeePass.Resources.KPRes.Password)
+			{
+				string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
+				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
+					PluginDebug.AddInfo(m, 0);
+				StringFormat sf = StringFormat.GenericDefault;
+				sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
+				sf.Trimming = StringTrimming.EllipsisCharacter;
+				Rectangle r = new Rectangle(e.Bounds.X + iPadding, e.Bounds.Y + iPaddingY, e.Bounds.Width - (2 * iPadding), e.Bounds.Height - (2 * iPaddingY));
+				e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
+				return;
+			}
 			string msg = "m_lvEntries: Handle password column '" + e.Header.Text + "' - Start";
 			PluginDebug.AddInfo(msg, 0);
 			string s = e.SubItem.Text;
