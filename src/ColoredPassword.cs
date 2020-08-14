@@ -18,6 +18,7 @@ namespace ColoredPassword
 		private ToolStripMenuItem m_menu = null;
 
 		private ListView m_lvEntries = null;
+		private bool m_bCheckQH = false; 
 
 		public override bool Initialize(IPluginHost host)
 		{
@@ -44,7 +45,7 @@ namespace ColoredPassword
 			}
 			else
 				PluginDebug.AddError("m_lvEntries not found", 0);
-			ColorPasswords(ColorConfig.Active);
+			ColorPasswords(ColorConfig.Active, false);
 
 			if (!OverridePossible && ColorConfig.FirstRun && ColorConfig.Active)
 				GlobalWindowManager.WindowAdded += OnKeyPromptFormLoad;
@@ -57,55 +58,65 @@ namespace ColoredPassword
 		{
 			m_host.MainWindow.FormLoadPost -= MainWindow_FormLoadPost;
 
-			if (ColorConfig.ColorEntryView)
-			{
-				m_lvEntries = (ListView)Tools.GetControl("m_lvEntries");
-				if (m_lvEntries == null) return;
-
-				#region Add important eventhandlers to debug info
-				m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
-				m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
-				if (PluginDebug.DebugMode)
-				{
-					List<string> lHandlers = new List<string>();
-					foreach (var d in m_OtherHandlers["DrawItem"])
-					{
-						lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
-					}
-					PluginDebug.AddInfo("m_lvEntries.DrawItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
-					lHandlers.Clear();
-					foreach (var d in m_OtherHandlers["DrawSubItem"])
-					{
-						lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
-					}
-					PluginDebug.AddInfo("m_lvEntries.DrawSubItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
-				}
-				#endregion
-
-				#region Handle OwnerDraw functionality of QualityHighlighter
-				Version vActual = null;
-				Version vRef = new Version(1, 3, 0, 1);
-				bool qhFound = Tools.GetLoadedPluginsName().TryGetValue("QualityHighlighter.QualityHighlighterExt", out vActual);
-				if (!qhFound) vActual = new Version();
-				PluginDebug.AddInfo("QualityHighlighter plugin status", 0,
-					"Found: " + qhFound.ToString(),
-					"Version: " + (qhFound ? vActual.ToString() : "N/A"),
-					"Special handling required: " + (qhFound ? (vActual <= vRef).ToString() : "N/A"));
-				if (qhFound && (vActual <= vRef))
-				{
-					m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
-					m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
-					m_lvEntries.RemoveEventHandlers("DrawSubItem", m_OtherHandlers["DrawSubItem"]);
-				}
-				else
-				{
-					m_OtherHandlers["DrawItem"].Clear();
-					m_OtherHandlers["DrawSubItem"].Clear();
-				}
-				#endregion
-			}
+			if (ColorConfig.ColorEntryView) CheckQH();
 
 			ColorPasswords(ColorConfig.Active);
+		}
+
+		private void CheckQH()
+		{
+			if (m_bCheckQH) return;
+			m_bCheckQH = true;
+			m_lvEntries = (ListView)Tools.GetControl("m_lvEntries");
+			if (m_lvEntries == null) return;
+
+			#region Add important eventhandlers to debug info
+			m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
+			m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
+			if (PluginDebug.DebugMode)
+			{
+				List<string> lHandlers = new List<string>();
+				foreach (var d in m_OtherHandlers["DrawItem"])
+				{
+					lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
+				}
+				PluginDebug.AddInfo("m_lvEntries.DrawItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
+				lHandlers.Clear();
+				foreach (var d in m_OtherHandlers["DrawSubItem"])
+				{
+					lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
+				}
+				PluginDebug.AddInfo("m_lvEntries.DrawSubItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
+			}
+			#endregion
+
+			#region Handle OwnerDraw functionality of QualityHighlighter
+			//It may be that a newer version than 1.3.0.1 is using a better approach to color entries
+			//Since the last update of this plugin was done 2017, I won't care about checking versions
+			//If an improved version is released, remove this part
+
+			//Store eventhandlers for later use
+			m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
+			m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
+			//Remove eventhandlers, so they won't mess up anything
+			m_lvEntries.RemoveEventHandlers("DrawItem", m_OtherHandlers["DrawItem"]);
+			m_lvEntries.RemoveEventHandlers("DrawSubItem", m_OtherHandlers["DrawSubItem"]);
+
+			bool qhFound = m_OtherHandlers["DrawItem"].Count > 0;
+
+			PluginDebug.AddInfo("QualityHighlighter plugin status", 0,
+				"Found: " + qhFound.ToString(),
+				"Removed: " + (qhFound ? qhFound.ToString() : "N/A"));
+			// QualityHighlighter version 1.3.0.1 and older does not handle DrawItem & DrawSubItem properly
+			// The plugin sets the entire listview item's background color and does it multiple times (for each and every subitem/cell)
+			// Changing this bot not setting DrawDefault to false is not a good idea, confuses the .NET framework and results in issues
+			// Would have been better if UpdateUI had been used...
+			if (!qhFound)
+			{
+				m_OtherHandlers["DrawItem"].Clear();
+				m_OtherHandlers["DrawSubItem"].Clear();
+			}
+			#endregion
 		}
 
 		private Color m_cBackgroundColor = Color.White;
@@ -233,7 +244,8 @@ namespace ColoredPassword
 				PluginDebug.AddInfo(msg, 0, lMsg.ToArray());
 				RectangleF r = new RectangleF(x, e.Bounds.Y + iPaddingY, fWidth, e.Bounds.Height - (2 * iPaddingY));
 				e.Graphics.FillRectangle(new SolidBrush(colb), r);
-				e.Graphics.DrawString(s.Substring(i, 1), fFont, new SolidBrush(col), r, sf);
+				PointF p = new PointF(r.X, r.Y); //Win 7 calculates width of certain characters wrong and they wonÄt be drawn because they're larger than the rectangle
+				e.Graphics.DrawString(s.Substring(i, 1), fFont, new SolidBrush(col), p, sf);
 				x += fWidth;
 				i++;
 			}
@@ -328,6 +340,11 @@ namespace ColoredPassword
 		#region Override SecureTextBoxEx with ColoredSecureTextBox
 		private void ColorPasswords(bool active)
 		{
+			ColorPasswords(active, true);
+		}
+
+		private void ColorPasswords(bool active, bool bCheckForQH)
+		{
 			if (!OverridePossible)
 			{
 				PluginDebug.AddError("TypeOverride not possible");
@@ -340,6 +357,7 @@ namespace ColoredPassword
 			}
 			if (ColorConfig.ColorEntryView)
 			{
+				if (bCheckForQH) CheckQH();
 				if (m_lvEntries != null)
 				{
 					m_lvEntries.OwnerDraw = active || m_OtherHandlers["DrawItem"].Count > 0;

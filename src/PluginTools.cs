@@ -120,7 +120,15 @@ namespace PluginTools
 				while (PluginIterator.MoveNext())
 				{
 					object result = GetField("m_pluginInterface", PluginIterator.Current);
-					dPlugins[result.GetType().FullName] = result.GetType().Assembly.GetName().Version;
+					var x = result.GetType().Assembly;
+					object[] v = x.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
+					Version ver = null;
+					if ((v != null) && (v.Length > 0))
+						ver = new Version(((AssemblyFileVersionAttribute)v[0]).Version);
+					else
+						ver = result.GetType().Assembly.GetName().Version;
+					if (ver.Revision < 0) ver = new Version(ver.Major, ver.Minor, ver.Build, 0);
+					dPlugins[result.GetType().FullName] = ver;
 				}
 			}
 			catch (Exception) { }
@@ -231,7 +239,7 @@ namespace PluginTools
 			Version v = new Version(0, 0);
 			GetLoadedPluginsName().TryGetValue(sPluginName.Replace("Ext", string.Empty) + "." + sPluginName, out v);
 			if (v == null) PluginDebug.AddError("Could not get loaded plugins' data", 0);
-			string ver = v.ToString();
+			string ver = (v == null) ? "???" : v.ToString();
 			if (ver.EndsWith(".0")) ver = ver.Substring(0, ver.Length - 2);
 			else ver += " (Dev)";
 			lvi.SubItems.Add(ver);
