@@ -218,8 +218,10 @@ namespace ColoredPassword
 			{
 				StringFormat sf = StringFormat.GenericTypographic;
 				//Measuring only the to be drawn character produces wrong results
-				float fWidth = e.Graphics.MeasureString("A!r" + s.Substring(i, 1), fFont, int.MaxValue, sf).Width;
-				fWidth -= e.Graphics.MeasureString("A!r", fFont, int.MaxValue, sf).Width;
+				//Place to be measured character inbetween something else
+				//Trailing spacs are skipped and nothing would be shown
+				float fWidth = e.Graphics.MeasureString("A!r" + s.Substring(i, 1) + "A!r", fFont, int.MaxValue, sf).Width;
+				fWidth -= e.Graphics.MeasureString("A!rA!r", fFont, int.MaxValue, sf).Width;
 				if ((e.Bounds.X + e.Bounds.Width) <= (x + fWidth)) break;
 				Color col = ColorConfig.ForeColorDefault;
 				Color colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorDefault;
@@ -253,7 +255,8 @@ namespace ColoredPassword
 				PluginDebug.AddInfo(msg, 0, lMsg.ToArray());
 				RectangleF r = new RectangleF(x, e.Bounds.Y + iPaddingY, fWidth, e.Bounds.Height - (2 * iPaddingY));
 				e.Graphics.FillRectangle(new SolidBrush(colb), r);
-				PointF p = new PointF(r.X, r.Y); //Win 7 calculates width of certain characters wrong and they wonÄt be drawn because they're larger than the rectangle
+				//Win 7 calculates width of certain characters wrong and they won't be drawn because they're larger than the rectangle
+				PointF p = new PointF(r.X, r.Y); 
 				e.Graphics.DrawString(s.Substring(i, 1), fFont, new SolidBrush(col), p, sf);
 				x += fWidth;
 				i++;
