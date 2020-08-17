@@ -184,6 +184,15 @@ namespace ColoredPassword
 				//This way, explicitly set background colors do have higher priority
 				if (cItemBackground == e.Item.ListView.BackColor) cItemBackground = m_cBackgroundColor;
 			}
+			if ((ColorConfig.DrawMode == ColorConfig.ListViewDrawMode.DrawPasswordOnly) && (e.Header.Text != KeePass.Resources.KPRes.Password))
+			{
+				e.Item.BackColor = e.SubItem.BackColor = cItemBackground;
+				e.DrawDefault = true;
+				string m = "m_lvEntries: Standard display for column '" + e.Header.Text + "'";
+				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
+					PluginDebug.AddInfo(m, 0);
+				return;
+			}
 			Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
 			if (!e.Item.Selected) e.Graphics.FillRectangle(new SolidBrush(cItemBackground), e.Bounds);
 			int iPadding = 3;
@@ -525,6 +534,25 @@ namespace ColoredPassword
 			}
 		}
 		public static bool ListViewKeepBackgroundColor = true;
+		public static ListViewDrawMode DrawMode
+		{
+			get
+			{
+				if (KeePassLib.Native.NativeLib.IsUnix()) return ListViewDrawMode.DrawAllColumns;
+				string m = KeePass.Program.Config.CustomConfig.GetString("ColoredPassword.DrawMode", ListViewDrawMode.DrawPasswordOnly.ToString());
+				ListViewDrawMode r = ListViewDrawMode.DrawPasswordOnly;
+				try
+				{
+					r = (ListViewDrawMode)Enum.Parse(typeof(ListViewDrawMode), m, true);
+					return r;
+				}
+				catch
+				{
+					KeePass.Program.Config.CustomConfig.SetString("ColoredPassword.DrawMode", ListViewDrawMode.DrawPasswordOnly.ToString());
+					return ListViewDrawMode.DrawPasswordOnly;
+				}
+			}
+		}
 
 		public static void Read(IPluginHost host)
 		{
@@ -622,6 +650,12 @@ namespace ColoredPassword
 			m_BackColorDigitTest = m_BackColorDigit;
 			m_ForeColorSpecialTest = m_ForeColorSpecial;
 			m_BackColorSpecialTest = m_BackColorSpecial;
+		}
+
+		internal enum ListViewDrawMode
+		{
+			DrawAllColumns,
+			DrawPasswordOnly,
 		}
 	}
 }
