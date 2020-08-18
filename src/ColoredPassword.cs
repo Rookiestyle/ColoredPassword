@@ -18,6 +18,7 @@ namespace ColoredPassword
 		private ToolStripMenuItem m_menu = null;
 
 		private ListView m_lvEntries = null;
+		private bool m_bCheckQH = false; 
 
 		public override bool Initialize(IPluginHost host)
 		{
@@ -44,7 +45,7 @@ namespace ColoredPassword
 			}
 			else
 				PluginDebug.AddError("m_lvEntries not found", 0);
-			ColorPasswords(ColorConfig.Active);
+			ColorPasswords(ColorConfig.Active, false);
 
 			if (!OverridePossible && ColorConfig.FirstRun && ColorConfig.Active)
 				GlobalWindowManager.WindowAdded += OnKeyPromptFormLoad;
@@ -57,55 +58,65 @@ namespace ColoredPassword
 		{
 			m_host.MainWindow.FormLoadPost -= MainWindow_FormLoadPost;
 
-			if (ColorConfig.ColorEntryView)
-			{
-				m_lvEntries = (ListView)Tools.GetControl("m_lvEntries");
-				if (m_lvEntries == null) return;
-
-				#region Add important eventhandlers to debug info
-				m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
-				m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
-				if (PluginDebug.DebugMode)
-				{
-					List<string> lHandlers = new List<string>();
-					foreach (var d in m_OtherHandlers["DrawItem"])
-					{
-						lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
-					}
-					PluginDebug.AddInfo("m_lvEntries.DrawItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
-					lHandlers.Clear();
-					foreach (var d in m_OtherHandlers["DrawSubItem"])
-					{
-						lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
-					}
-					PluginDebug.AddInfo("m_lvEntries.DrawSubItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
-				}
-				#endregion
-
-				#region Handle OwnerDraw functionality of QualityHighlighter
-				Version vActual = null;
-				Version vRef = new Version(1, 3, 0, 1);
-				bool qhFound = Tools.GetLoadedPluginsName().TryGetValue("QualityHighlighter.QualityHighlighterExt", out vActual);
-				if (!qhFound) vActual = new Version();
-				PluginDebug.AddInfo("QualityHighlighter plugin status", 0,
-					"Found: " + qhFound.ToString(),
-					"Version: " + (qhFound ? vActual.ToString() : "N/A"),
-					"Special handling required: " + (qhFound ? (vActual <= vRef).ToString() : "N/A"));
-				if (qhFound && (vActual <= vRef))
-				{
-					m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
-					m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
-					m_lvEntries.RemoveEventHandlers("DrawSubItem", m_OtherHandlers["DrawSubItem"]);
-				}
-				else
-				{
-					m_OtherHandlers["DrawItem"].Clear();
-					m_OtherHandlers["DrawSubItem"].Clear();
-				}
-				#endregion
-			}
+			if (ColorConfig.ColorEntryView) CheckQH();
 
 			ColorPasswords(ColorConfig.Active);
+		}
+
+		private void CheckQH()
+		{
+			if (m_bCheckQH) return;
+			m_bCheckQH = true;
+			m_lvEntries = (ListView)Tools.GetControl("m_lvEntries");
+			if (m_lvEntries == null) return;
+
+			#region Add important eventhandlers to debug info
+			m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
+			m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => !x.Method.DeclaringType.FullName.Contains("ColoredPassword"));
+			if (PluginDebug.DebugMode)
+			{
+				List<string> lHandlers = new List<string>();
+				foreach (var d in m_OtherHandlers["DrawItem"])
+				{
+					lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
+				}
+				PluginDebug.AddInfo("m_lvEntries.DrawItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
+				lHandlers.Clear();
+				foreach (var d in m_OtherHandlers["DrawSubItem"])
+				{
+					lHandlers.Add(d.Method.Name + " (" + d.Method.DeclaringType.FullName + ")");
+				}
+				PluginDebug.AddInfo("m_lvEntries.DrawSubItem handlers: " + lHandlers.Count, 0, lHandlers.ToArray());
+			}
+			#endregion
+
+			#region Handle OwnerDraw functionality of QualityHighlighter
+			//It may be that a newer version than 1.3.0.1 is using a better approach to color entries
+			//Since the last update of this plugin was done 2017, I won't care about checking versions
+			//If an improved version is released, remove this part
+
+			//Store eventhandlers for later use
+			m_OtherHandlers["DrawItem"] = m_lvEntries.GetEventHandlers("DrawItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
+			m_OtherHandlers["DrawSubItem"] = m_lvEntries.GetEventHandlers("DrawSubItem").FindAll(x => x.Method.DeclaringType.FullName.Contains("QualityHighlighter"));
+			//Remove eventhandlers, so they won't mess up anything
+			m_lvEntries.RemoveEventHandlers("DrawItem", m_OtherHandlers["DrawItem"]);
+			m_lvEntries.RemoveEventHandlers("DrawSubItem", m_OtherHandlers["DrawSubItem"]);
+
+			bool qhFound = m_OtherHandlers["DrawItem"].Count > 0;
+
+			PluginDebug.AddInfo("QualityHighlighter plugin status", 0,
+				"Found: " + qhFound.ToString(),
+				"Removed: " + (qhFound ? qhFound.ToString() : "N/A"));
+			// QualityHighlighter version 1.3.0.1 and older does not handle DrawItem & DrawSubItem properly
+			// The plugin sets the entire listview item's background color and does it multiple times (for each and every subitem/cell)
+			// Changing this bot not setting DrawDefault to false is not a good idea, confuses the .NET framework and results in issues
+			// Would have been better if UpdateUI had been used...
+			if (!qhFound)
+			{
+				m_OtherHandlers["DrawItem"].Clear();
+				m_OtherHandlers["DrawSubItem"].Clear();
+			}
+			#endregion
 		}
 
 		private Color m_cBackgroundColor = Color.White;
@@ -165,6 +176,7 @@ namespace ColoredPassword
 				e.DrawDefault = true;
 				return;
 			}
+
 			Color cItemForeground = e.Item.UseItemStyleForSubItems ? e.Item.ForeColor : e.SubItem.ForeColor;
 			Color cItemBackground = e.Item.UseItemStyleForSubItems ? e.Item.BackColor : e.SubItem.BackColor;
 			if (KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors && ((e.ItemIndex & 1) == 1))
@@ -174,54 +186,44 @@ namespace ColoredPassword
 				if (cItemBackground == e.Item.ListView.BackColor) cItemBackground = m_cBackgroundColor;
 			}
 			Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
-			if (!e.Item.Selected) e.Graphics.FillRectangle(new SolidBrush(cItemBackground), e.Bounds);
-			int iPadding = 3;
-			int iPaddingY = 2;
-			if (e.Header.Text != KeePass.Resources.KPRes.Password)
+
+			//Differentiate between different drawing modes
+			if ((ColorConfig.DrawMode == ColorConfig.ListViewDrawMode.DrawPasswordOnly) && (e.Header.Text != KeePass.Resources.KPRes.Password))
 			{
-				string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
-				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
-					PluginDebug.AddInfo(m, 0);
-				StringFormat sf = StringFormat.GenericDefault;
-				sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
-				sf.Trimming = StringTrimming.EllipsisCharacter;
-				Rectangle r = new Rectangle(e.Bounds.X + iPadding, e.Bounds.Y + iPaddingY, e.Bounds.Width - (2 * iPadding), e.Bounds.Height - (2 * iPaddingY));
-				e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
+				Lv_DrawSubItem_Standard(e, cItemBackground);
 				return;
 			}
+
+			if (!e.Item.Selected) e.Graphics.FillRectangle(new SolidBrush(cItemBackground), new RectangleF(e.Bounds.X + 1, e.Bounds.Y, e.Bounds.Width - 2, e.Bounds.Height));
+			int iPaddingX = 3;
+			int iPaddingY = 2;
+
+			if (e.Header.Text != KeePass.Resources.KPRes.Password)
+			{
+				Lv_DrawSubItem_NoPassword(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
+				return;
+			}
+			else Lv_DrawSubItem_Password(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
+		}
+
+		private void Lv_DrawSubItem_Password(DrawListViewSubItemEventArgs e, Color cItemForeground, Color cItemBackground, Font fFont, int iPaddingX, int iPaddingY)
+		{
 			string msg = "m_lvEntries: Handle password column '" + e.Header.Text + "' - Start";
 			PluginDebug.AddInfo(msg, 0);
-			string s = e.SubItem.Text;
-			float x = e.Bounds.X + iPadding;
-			int i = 0;
-			while (i < s.Length)
+			char[] s = e.SubItem.Text.ToCharArray();
+			float x = e.Bounds.X + iPaddingX;
+			for (int i = 0; i < s.Length; i++)
 			{
 				StringFormat sf = StringFormat.GenericTypographic;
 				//Measuring only the to be drawn character produces wrong results
-				float fWidth = e.Graphics.MeasureString("A!r" + s.Substring(i, 1), fFont, int.MaxValue, sf).Width;
-				fWidth -= e.Graphics.MeasureString("A!r", fFont, int.MaxValue, sf).Width;
+				//Place to be measured character inbetween something else
+				//Trailing spacs are skipped and nothing would be shown
+				float fWidth = e.Graphics.MeasureString("A!r" + s[i] + "A!r", fFont, int.MaxValue, sf).Width;
+				fWidth -= e.Graphics.MeasureString("A!rA!r", fFont, int.MaxValue, sf).Width;
 				if ((e.Bounds.X + e.Bounds.Width) <= (x + fWidth)) break;
-				Color col = ColorConfig.ForeColorDefault;
-				Color colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorDefault;
-				msg = "Color letter";
-				if (char.IsDigit(s, i))
-				{
-					col = ColorConfig.ForeColorDigit;
-					colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorDigit;
-					msg = "Color digit";
-				}
-				else if (!char.IsLetter(s, i))
-				{
-					col = ColorConfig.ForeColorSpecial;
-					colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorSpecial;
-					msg = "Color special char";
-				}
-				else if (ColorConfig.LowercaseDifferent && char.IsLower(s, i))
-				{
-					col = ColorConfig.ForeColorLower;
-					colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorLower;
-					msg = "Color lowercase char";
-				}
+				Color col;
+				Color colb;
+				msg = GetPasswordCharColor(s[i], out col, out colb, cItemBackground);
 				List<string> lMsg = new List<string>();
 				if (col.ToArgb() == colb.ToArgb())
 				{
@@ -233,12 +235,62 @@ namespace ColoredPassword
 				PluginDebug.AddInfo(msg, 0, lMsg.ToArray());
 				RectangleF r = new RectangleF(x, e.Bounds.Y + iPaddingY, fWidth, e.Bounds.Height - (2 * iPaddingY));
 				e.Graphics.FillRectangle(new SolidBrush(colb), r);
-				e.Graphics.DrawString(s.Substring(i, 1), fFont, new SolidBrush(col), r, sf);
+				//Win 7 calculates width of certain characters wrong and they won't be drawn because they're larger than the rectangle
+				PointF p = new PointF(r.X, r.Y);
+				e.Graphics.DrawString(e.SubItem.Text.Substring(i, 1), fFont, new SolidBrush(col), p, sf);
 				x += fWidth;
-				i++;
 			}
 			msg = "m_lvEntries: Handle password column '" + e.Header.Text + "' - Finish";
 			PluginDebug.AddInfo(msg, 0);
+		}
+
+		private string GetPasswordCharColor(char c, out Color cItemForeground, out Color cItemBackground, Color cBackcolorLV)
+		{
+			string msg = "Color letter";
+			if (char.IsDigit(c))
+			{
+				cItemForeground = ColorConfig.ForeColorDigit;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorDigit;
+				msg = "Color digit";
+			}
+			else if (!char.IsLetter(c))
+			{
+				cItemForeground = ColorConfig.ForeColorSpecial;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorSpecial;
+				msg = "Color special char";
+			}
+			else if (ColorConfig.LowercaseDifferent && char.IsLower(c))
+			{
+				cItemForeground = ColorConfig.ForeColorLower;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorLower;
+				msg = "Color lowercase char";
+			}
+			else
+			{
+				cItemForeground = ColorConfig.ForeColorDefault;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorDefault;
+				msg = "Color letter";
+			}
+			return msg;
+		}
+
+		private void Lv_DrawSubItem_NoPassword(DrawListViewSubItemEventArgs e, Color cItemForeground, Color cItemBackground, Font fFont, int iPaddingX, int iPaddingY)
+		{
+			string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
+			if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
+			StringFormat sf = StringFormat.GenericDefault;
+			sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
+			sf.Trimming = StringTrimming.EllipsisCharacter;
+			Rectangle r = new Rectangle(e.Bounds.X + iPaddingX, e.Bounds.Y + iPaddingY, e.Bounds.Width - (2 * iPaddingX), e.Bounds.Height - (2 * iPaddingY));
+			e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
+		}
+
+		private void Lv_DrawSubItem_Standard(DrawListViewSubItemEventArgs e, Color cBackcolor)
+		{
+			e.Item.BackColor = e.SubItem.BackColor = cBackcolor;
+			e.DrawDefault = true;
+			string m = "m_lvEntries: Standard display for column '" + e.Header.Text + "'";
+			if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
 		}
 
 		private Color ContrastColor(Color c)
@@ -328,6 +380,11 @@ namespace ColoredPassword
 		#region Override SecureTextBoxEx with ColoredSecureTextBox
 		private void ColorPasswords(bool active)
 		{
+			ColorPasswords(active, true);
+		}
+
+		private void ColorPasswords(bool active, bool bCheckForQH)
+		{
 			if (!OverridePossible)
 			{
 				PluginDebug.AddError("TypeOverride not possible");
@@ -340,6 +397,7 @@ namespace ColoredPassword
 			}
 			if (ColorConfig.ColorEntryView)
 			{
+				if (bCheckForQH) CheckQH();
 				if (m_lvEntries != null)
 				{
 					m_lvEntries.OwnerDraw = active || m_OtherHandlers["DrawItem"].Count > 0;
@@ -507,6 +565,25 @@ namespace ColoredPassword
 			}
 		}
 		public static bool ListViewKeepBackgroundColor = true;
+		public static ListViewDrawMode DrawMode
+		{
+			get
+			{
+				if (KeePassLib.Native.NativeLib.IsUnix()) return ListViewDrawMode.DrawAllColumns;
+				string m = KeePass.Program.Config.CustomConfig.GetString("ColoredPassword.DrawMode", ListViewDrawMode.DrawPasswordOnly.ToString());
+				ListViewDrawMode r = ListViewDrawMode.DrawPasswordOnly;
+				try
+				{
+					r = (ListViewDrawMode)Enum.Parse(typeof(ListViewDrawMode), m, true);
+					return r;
+				}
+				catch
+				{
+					KeePass.Program.Config.CustomConfig.SetString("ColoredPassword.DrawMode", ListViewDrawMode.DrawPasswordOnly.ToString());
+					return ListViewDrawMode.DrawPasswordOnly;
+				}
+			}
+		}
 
 		public static void Read(IPluginHost host)
 		{
@@ -604,6 +681,12 @@ namespace ColoredPassword
 			m_BackColorDigitTest = m_BackColorDigit;
 			m_ForeColorSpecialTest = m_ForeColorSpecial;
 			m_BackColorSpecialTest = m_BackColorSpecial;
+		}
+
+		internal enum ListViewDrawMode
+		{
+			DrawAllColumns,
+			DrawPasswordOnly,
 		}
 	}
 }

@@ -52,9 +52,12 @@ namespace PluginTools
 						if (lDel.Count == 0) continue;
 						result.AddRange(lDel);
 					}
-					Delegate[] dels = eh.GetInvocationList();
-					if (dels == null) continue;
-					result.AddRange(dels);
+					else
+					{
+						Delegate[] dels = eh.GetInvocationList();
+						if (dels == null) continue;
+						result.AddRange(dels);
+					}
 				}
 				else
 				{
@@ -194,9 +197,15 @@ namespace PluginTools
 			//   doesn't work because Fieds are PRIVATE)
 			var eil = t.GetEvents(AllBindings);
 			lst.Clear();
+			Dictionary<Type, List<FieldInfo>> dBuffer = new Dictionary<Type, List<FieldInfo>>();
 			foreach (EventInfo ei in eil)
 			{
 				Type dt = ei.DeclaringType;
+				if (!dBuffer.ContainsKey(dt))
+				{
+					dBuffer[dt] = new List<FieldInfo>();
+					dBuffer[dt].AddRange(dt.GetFields(AllBindings));
+				}
 				FieldInfo fi = t.GetField(ei.Name, AllBindings);
 				if (fi == null)
 					fi = dt.GetField(ei.Name, AllBindings);
@@ -208,6 +217,11 @@ namespace PluginTools
 					fi = t.GetField(ei.Name + "Event", AllBindings);
 				if (fi == null)
 					fi = dt.GetField(ei.Name + "Event", AllBindings);
+				if ((fi == null)) // && (dt.Name == "ListView"))
+				{
+					fi = dBuffer[dt].Find(x => x.Name.ToLowerInvariant() == "event_" + ei.Name.ToLowerInvariant());
+					if (fi == null) fi = dBuffer[dt].Find(x => x.Name.ToLowerInvariant() == ei.Name.ToLowerInvariant() + "_event");
+				}
 				if (fi != null)
 					lst.Add(fi);
 			}
@@ -234,6 +248,10 @@ namespace PluginTools
 			if (string.Compare("Event" + sEventName, fi.Name, true) == 0)
 				return true;
 			if (string.Compare(sEventName + "Event", fi.Name, true) == 0)
+				return true;
+			if (string.Compare("Event_" + sEventName, fi.Name, true) == 0)
+				return true;
+			if (string.Compare(sEventName + "_Event", fi.Name, true) == 0)
 				return true;
 			return false;
 		}
