@@ -41,9 +41,9 @@ This will ensure the entire line will have the same background color, but - depe
 ![Options](images/ColoredPassword%20-%20Entry%20List.png)
 
 # Translations
-ColoredPassword is provided with english language built-in and allow usage of translation files.
+ColoredPassword is provided with English language built-in and allow usage of translation files.
 These translation files need to be placed in a folder called *Translations* inside in your plugin folder.
-If a text is missing in the translation file, it is backfilled with the english text.
+If a text is missing in the translation file, it is backfilled with English text.
 You're welcome to add additional translation files by creating a pull request.
 
 Naming convention for translation files: `<plugin name>.<language identifier>.language.xml`\

@@ -176,6 +176,7 @@ namespace ColoredPassword
 				e.DrawDefault = true;
 				return;
 			}
+
 			Color cItemForeground = e.Item.UseItemStyleForSubItems ? e.Item.ForeColor : e.SubItem.ForeColor;
 			Color cItemBackground = e.Item.UseItemStyleForSubItems ? e.Item.BackColor : e.SubItem.BackColor;
 			if (KeePass.Program.Config.MainWindow.EntryListAlternatingBgColors && ((e.ItemIndex & 1) == 1))
@@ -184,66 +185,45 @@ namespace ColoredPassword
 				//This way, explicitly set background colors do have higher priority
 				if (cItemBackground == e.Item.ListView.BackColor) cItemBackground = m_cBackgroundColor;
 			}
+			Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
+
+			//Differentiate between different drawing modes
 			if ((ColorConfig.DrawMode == ColorConfig.ListViewDrawMode.DrawPasswordOnly) && (e.Header.Text != KeePass.Resources.KPRes.Password))
 			{
-				e.Item.BackColor = e.SubItem.BackColor = cItemBackground;
-				e.DrawDefault = true;
-				string m = "m_lvEntries: Standard display for column '" + e.Header.Text + "'";
-				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
-					PluginDebug.AddInfo(m, 0);
+				Lv_DrawSubItem_Standard(e, cItemBackground);
 				return;
 			}
-			Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
-			if (!e.Item.Selected) e.Graphics.FillRectangle(new SolidBrush(cItemBackground), e.Bounds);
-			int iPadding = 3;
+
+			if (!e.Item.Selected) e.Graphics.FillRectangle(new SolidBrush(cItemBackground), new RectangleF(e.Bounds.X + 1, e.Bounds.Y, e.Bounds.Width - 2, e.Bounds.Height));
+			int iPaddingX = 3;
 			int iPaddingY = 2;
+
 			if (e.Header.Text != KeePass.Resources.KPRes.Password)
 			{
-				string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
-				if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m))
-					PluginDebug.AddInfo(m, 0);
-				StringFormat sf = StringFormat.GenericDefault;
-				sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
-				sf.Trimming = StringTrimming.EllipsisCharacter;
-				Rectangle r = new Rectangle(e.Bounds.X + iPadding, e.Bounds.Y + iPaddingY, e.Bounds.Width - (2 * iPadding), e.Bounds.Height - (2 * iPaddingY));
-				e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
+				Lv_DrawSubItem_NoPassword(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
 				return;
 			}
+			else Lv_DrawSubItem_Password(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
+		}
+
+		private void Lv_DrawSubItem_Password(DrawListViewSubItemEventArgs e, Color cItemForeground, Color cItemBackground, Font fFont, int iPaddingX, int iPaddingY)
+		{
 			string msg = "m_lvEntries: Handle password column '" + e.Header.Text + "' - Start";
 			PluginDebug.AddInfo(msg, 0);
-			string s = e.SubItem.Text;
-			float x = e.Bounds.X + iPadding;
-			int i = 0;
-			while (i < s.Length)
+			char[] s = e.SubItem.Text.ToCharArray();
+			float x = e.Bounds.X + iPaddingX;
+			for (int i = 0; i < s.Length; i++)
 			{
 				StringFormat sf = StringFormat.GenericTypographic;
 				//Measuring only the to be drawn character produces wrong results
 				//Place to be measured character inbetween something else
 				//Trailing spacs are skipped and nothing would be shown
-				float fWidth = e.Graphics.MeasureString("A!r" + s.Substring(i, 1) + "A!r", fFont, int.MaxValue, sf).Width;
+				float fWidth = e.Graphics.MeasureString("A!r" + s[i] + "A!r", fFont, int.MaxValue, sf).Width;
 				fWidth -= e.Graphics.MeasureString("A!rA!r", fFont, int.MaxValue, sf).Width;
 				if ((e.Bounds.X + e.Bounds.Width) <= (x + fWidth)) break;
-				Color col = ColorConfig.ForeColorDefault;
-				Color colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorDefault;
-				msg = "Color letter";
-				if (char.IsDigit(s, i))
-				{
-					col = ColorConfig.ForeColorDigit;
-					colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorDigit;
-					msg = "Color digit";
-				}
-				else if (!char.IsLetter(s, i))
-				{
-					col = ColorConfig.ForeColorSpecial;
-					colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorSpecial;
-					msg = "Color special char";
-				}
-				else if (ColorConfig.LowercaseDifferent && char.IsLower(s, i))
-				{
-					col = ColorConfig.ForeColorLower;
-					colb = ColorConfig.ListViewKeepBackgroundColor ? cItemBackground : ColorConfig.BackColorLower;
-					msg = "Color lowercase char";
-				}
+				Color col;
+				Color colb;
+				msg = GetPasswordCharColor(s[i], out col, out colb, cItemBackground);
 				List<string> lMsg = new List<string>();
 				if (col.ToArgb() == colb.ToArgb())
 				{
@@ -256,13 +236,61 @@ namespace ColoredPassword
 				RectangleF r = new RectangleF(x, e.Bounds.Y + iPaddingY, fWidth, e.Bounds.Height - (2 * iPaddingY));
 				e.Graphics.FillRectangle(new SolidBrush(colb), r);
 				//Win 7 calculates width of certain characters wrong and they won't be drawn because they're larger than the rectangle
-				PointF p = new PointF(r.X, r.Y); 
-				e.Graphics.DrawString(s.Substring(i, 1), fFont, new SolidBrush(col), p, sf);
+				PointF p = new PointF(r.X, r.Y);
+				e.Graphics.DrawString(e.SubItem.Text.Substring(i, 1), fFont, new SolidBrush(col), p, sf);
 				x += fWidth;
-				i++;
 			}
 			msg = "m_lvEntries: Handle password column '" + e.Header.Text + "' - Finish";
 			PluginDebug.AddInfo(msg, 0);
+		}
+
+		private string GetPasswordCharColor(char c, out Color cItemForeground, out Color cItemBackground, Color cBackcolorLV)
+		{
+			string msg = "Color letter";
+			if (char.IsDigit(c))
+			{
+				cItemForeground = ColorConfig.ForeColorDigit;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorDigit;
+				msg = "Color digit";
+			}
+			else if (!char.IsLetter(c))
+			{
+				cItemForeground = ColorConfig.ForeColorSpecial;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorSpecial;
+				msg = "Color special char";
+			}
+			else if (ColorConfig.LowercaseDifferent && char.IsLower(c))
+			{
+				cItemForeground = ColorConfig.ForeColorLower;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorLower;
+				msg = "Color lowercase char";
+			}
+			else
+			{
+				cItemForeground = ColorConfig.ForeColorDefault;
+				cItemBackground = ColorConfig.ListViewKeepBackgroundColor ? cBackcolorLV : ColorConfig.BackColorDefault;
+				msg = "Color letter";
+			}
+			return msg;
+		}
+
+		private void Lv_DrawSubItem_NoPassword(DrawListViewSubItemEventArgs e, Color cItemForeground, Color cItemBackground, Font fFont, int iPaddingX, int iPaddingY)
+		{
+			string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
+			if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
+			StringFormat sf = StringFormat.GenericDefault;
+			sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
+			sf.Trimming = StringTrimming.EllipsisCharacter;
+			Rectangle r = new Rectangle(e.Bounds.X + iPaddingX, e.Bounds.Y + iPaddingY, e.Bounds.Width - (2 * iPaddingX), e.Bounds.Height - (2 * iPaddingY));
+			e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
+		}
+
+		private void Lv_DrawSubItem_Standard(DrawListViewSubItemEventArgs e, Color cBackcolor)
+		{
+			e.Item.BackColor = e.SubItem.BackColor = cBackcolor;
+			e.DrawDefault = true;
+			string m = "m_lvEntries: Standard display for column '" + e.Header.Text + "'";
+			if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
 		}
 
 		private Color ContrastColor(Color c)
