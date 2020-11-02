@@ -19,21 +19,25 @@ namespace ColoredPassword
 			bForeColorSpecial.Text = string.Empty;
 			bBackColorSpecial.Text = string.Empty;
 
+			tpSettings.Text = KeePass.Resources.KPRes.Options;
+			tpAdvanced.Text = KeePass.Resources.KPRes.Advanced;
+			
 			cgActive.Text = PluginTranslate.Active;
-			lText.Text = KeePass.Resources.KPRes.TextColor;
-			lBack.Text = KeePass.Resources.KPRes.BackgroundColor;
 			lDefault.Text = KeePass.Resources.KPRes.Default;
 			cbLowercase.Text = PluginTranslate.LowercaseDifferentColor;
 			lDigits.Text = PluginTranslate.CharDigit;
 			lSpecial.Text = PluginTranslate.CharSpecial;
-			cbColorEntryView.Text = PluginTranslate.ColorEntryView;
-			cbColorEntryViewKeepBackgroundColor.Text = PluginTranslate.ColorEntryViewKeepBackgroundColor;
+
 			gExample.Text = PluginTranslate.Example;
 
 			lError.Text = string.Format(PluginTranslate.Error, typeof(KeePass.UI.SecureTextBoxEx).BaseType.Name);
-			
-			lError2.Visible = !KeePass.App.AppPolicy.Current.UnhidePasswords;
-			lError2.Text = KeePass.Resources.KPRes.PolicyRequiredFlag + ": " + KeePass.Resources.KPRes.UnhidePasswords; ;
+			lError2.Text = KeePass.Resources.KPRes.PolicyRequiredFlag + ": " + KeePass.Resources.KPRes.UnhidePasswords;
+
+			gEntryView.Text = KeePass.Resources.KPRes.EntryList;
+
+			cbColorEntryView.Text = PluginTranslate.ColorEntryView;
+			cbColorEntryViewKeepBackgroundColor.Text = PluginTranslate.ColorEntryViewKeepBackgroundColor;
+			cbSinglePwDisplay.Text = PluginTranslate.SinglePwDisplay;
 		}
 
 		private void OnColorSelect(object sender, EventArgs e)
@@ -54,12 +58,10 @@ namespace ColoredPassword
 
 		public void Options_Resize(object sender, EventArgs e)
 		{
-			tlp.ColumnStyles[1].SizeType = tlp.ColumnStyles[2].SizeType = SizeType.AutoSize;
-			int w = (int)Math.Max(lText.Width, lBack.Width) + 10;
-			w = Math.Min(w, tlp.ClientSize.Width / 3);
-			tlp.ColumnStyles[1].SizeType = tlp.ColumnStyles[2].SizeType = SizeType.Absolute;
-			tlp.ColumnStyles[1].Width = tlp.ColumnStyles[2].Width = w;
-			pError.Visible = lError.Visible || lError2.Visible;
+			pError.Visible = !ColoredPasswordExt.OverridePossible || !KeePass.App.AppPolicy.Current.UnhidePasswords;
+			lError2.Visible = !KeePass.App.AppPolicy.Current.UnhidePasswords;
+			lError.Visible = !ColoredPasswordExt.OverridePossible;
+			if (!lError.Visible && lError2.Visible) lError2.Top = lError.Top;
 		}
 
 		private void cbLowercase_CheckedChanged(object sender, EventArgs e)
