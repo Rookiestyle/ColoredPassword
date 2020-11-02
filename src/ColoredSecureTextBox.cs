@@ -227,6 +227,7 @@ namespace ColoredPassword
 
 	public class ColorTextBox : RichTextBox
 	{
+		public bool ColorBackground = true;
 		protected override void Dispose(bool disposing)
 		{
 			base.Dispose(disposing);
@@ -240,6 +241,8 @@ namespace ColoredPassword
 
 		public ColorTextBox() : base()
 		{
+			Multiline = false;
+
 			//Keep ContextMenuStrip_Opening in sync with this
 			ContextMenuStrip = new ContextMenuStrip();
 			ToolStripMenuItem m = new ToolStripMenuItem() { Text = KeePass.Resources.KPRes.Cut, Name = "CM_Cut" };
@@ -260,12 +263,6 @@ namespace ColoredPassword
 			m.Click += (o, e) => { Select(0, Text.Length); };
 			ContextMenuStrip.Items.Add(m);
 			ContextMenuStrip.Opening += ContextMenuStrip_Opening;
-		}
-
-		public override bool Multiline
-		{
-			get { return false; }
-			set { base.Multiline = false; }
 		}
 
 		protected override void OnTextChanged(EventArgs e)
@@ -328,19 +325,19 @@ namespace ColoredPassword
 				{
 					case CharType.Digit:
 						SelectionColor = ColorConfig.ForeColorDigit;
-						SelectionBackColor = ColorConfig.BackColorDigit;
+						if (ColorBackground) SelectionBackColor = ColorConfig.BackColorDigit;
 						break;
 					case CharType.Letter:
 						SelectionColor = ColorConfig.ForeColorDefault;
-						SelectionBackColor = ColorConfig.BackColorDefault;
+						if (ColorBackground) SelectionBackColor = ColorConfig.BackColorDefault;
 						break;
 					case CharType.Lowercase:
 						SelectionColor = ColorConfig.ForeColorLower;
-						SelectionBackColor = ColorConfig.BackColorLower;
+						if (ColorBackground) SelectionBackColor = ColorConfig.BackColorLower;
 						break;
 					case CharType.Special:
 						SelectionColor = ColorConfig.ForeColorSpecial;
-						SelectionBackColor = ColorConfig.BackColorSpecial;
+						if (ColorBackground) SelectionBackColor = ColorConfig.BackColorSpecial;
 						break;
 					default:
 						lMsg[lMsg.Count - 1] += " unknown character type";

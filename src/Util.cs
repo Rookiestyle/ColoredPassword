@@ -16,6 +16,7 @@ namespace ColoredPassword
 		public static bool Active = true;
 		public static bool ColorEntryView = true;
 		public static bool SinglePwDisplayActive = true;
+		public static bool ColorPwGen = true;
 		public static bool Testmode
 		{
 			get { return m_Testmode; }
@@ -155,6 +156,7 @@ namespace ColoredPassword
 			help = m_Config.GetString(ConfigPrefix + "BackColorLower", ColorToName(BackColorDefault));
 			BackColorLower = NameToColor(help);
 			SinglePwDisplayActive = m_Config.GetBool(ConfigPrefix + "SinglePwDisplay", SinglePwDisplayActive);
+			ColorPwGen = m_Config.GetBool(ConfigPrefix + "ColorPwGen", ColorPwGen);
 			Testmode = test;
 			Write();
 		}
@@ -178,6 +180,7 @@ namespace ColoredPassword
 			m_Config.SetString(ConfigPrefix + "ForeColorLower", ColorToName(ForeColorLower));
 			m_Config.SetString(ConfigPrefix + "BackColorLower", ColorToName(BackColorLower));
 			m_Config.SetBool(ConfigPrefix + "SinglePwDisplay", SinglePwDisplayActive);
+			m_Config.SetBool(ConfigPrefix + "ColorPwGen", ColorPwGen);
 			Testmode = test;
 		}
 

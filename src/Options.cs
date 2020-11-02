@@ -23,6 +23,8 @@ namespace ColoredPassword
 			tpAdvanced.Text = KeePass.Resources.KPRes.Advanced;
 			
 			cgActive.Text = PluginTranslate.Active;
+			//lText.Text = KeePass.Resources.KPRes.TextColor;
+			//lBack.Text = KeePass.Resources.KPRes.BackgroundColor;
 			lDefault.Text = KeePass.Resources.KPRes.Default;
 			cbLowercase.Text = PluginTranslate.LowercaseDifferentColor;
 			lDigits.Text = PluginTranslate.CharDigit;
@@ -38,6 +40,13 @@ namespace ColoredPassword
 			cbColorEntryView.Text = PluginTranslate.ColorEntryView;
 			cbColorEntryViewKeepBackgroundColor.Text = PluginTranslate.ColorEntryViewKeepBackgroundColor;
 			cbSinglePwDisplay.Text = PluginTranslate.SinglePwDisplay;
+			cbColorPwGen.Text = PluginTranslate.ColorPwGenDisplay;
+			try
+			{
+				var f = KeePass.Program.Translation.Forms.Find(x => x.FullName == "KeePass.Forms.PwGeneratorForm");
+				gPasswordGenerator.Text = f.Window.Text;
+			}
+			catch { }
 		}
 
 		private void OnColorSelect(object sender, EventArgs e)
@@ -68,6 +77,11 @@ namespace ColoredPassword
 		{
 			ColorConfig.LowercaseDifferent = cbLowercase.Checked;
 			ctbExample.ColorText();
+		}
+
+		private void cgActive_CheckedChanged(object sender, RookieUI.CheckedGroupCheckEventArgs e)
+		{
+			foreach (Control c in tpAdvanced.Controls) c.Enabled = cgActive.Checked;
 		}
 	}
 }

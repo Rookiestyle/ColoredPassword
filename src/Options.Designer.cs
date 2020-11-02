@@ -52,6 +52,8 @@
 			this.bForeColorSpecial = new System.Windows.Forms.Button();
 			this.bBackColorSpecial = new System.Windows.Forms.Button();
 			this.tpAdvanced = new System.Windows.Forms.TabPage();
+			this.gPasswordGenerator = new System.Windows.Forms.GroupBox();
+			this.cbColorPwGen = new System.Windows.Forms.CheckBox();
 			this.gEntryView = new System.Windows.Forms.GroupBox();
 			this.cbSinglePwDisplay = new System.Windows.Forms.CheckBox();
 			this.cbColorEntryViewKeepBackgroundColor = new System.Windows.Forms.CheckBox();
@@ -62,6 +64,7 @@
 			this.tpSettings.SuspendLayout();
 			this.cgActive.SuspendLayout();
 			this.tpAdvanced.SuspendLayout();
+			this.gPasswordGenerator.SuspendLayout();
 			this.gEntryView.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -171,6 +174,7 @@
 			this.cgActive.Size = new System.Drawing.Size(803, 200);
 			this.cgActive.TabIndex = 0;
 			this.cgActive.Text = "cgActive";
+			this.cgActive.CheckedChanged += new System.EventHandler<RookieUI.CheckedGroupCheckEventArgs>(this.cgActive_CheckedChanged);
 			// 
 			// lDefault
 			// 
@@ -300,6 +304,7 @@
 			// 
 			// tpAdvanced
 			// 
+			this.tpAdvanced.Controls.Add(this.gPasswordGenerator);
 			this.tpAdvanced.Controls.Add(this.gEntryView);
 			this.tpAdvanced.Location = new System.Drawing.Point(4, 29);
 			this.tpAdvanced.Name = "tpAdvanced";
@@ -308,6 +313,26 @@
 			this.tpAdvanced.TabIndex = 1;
 			this.tpAdvanced.Text = "Advanced";
 			this.tpAdvanced.UseVisualStyleBackColor = true;
+			// 
+			// gPasswordGenerator
+			// 
+			this.gPasswordGenerator.Controls.Add(this.cbColorPwGen);
+			this.gPasswordGenerator.Location = new System.Drawing.Point(3, 106);
+			this.gPasswordGenerator.Name = "gPasswordGenerator";
+			this.gPasswordGenerator.Size = new System.Drawing.Size(803, 55);
+			this.gPasswordGenerator.TabIndex = 6;
+			this.gPasswordGenerator.TabStop = false;
+			this.gPasswordGenerator.Text = "Password Generator";
+			// 
+			// cbColorPwGen
+			// 
+			this.cbColorPwGen.AutoSize = true;
+			this.cbColorPwGen.Location = new System.Drawing.Point(10, 22);
+			this.cbColorPwGen.Name = "cbColorPwGen";
+			this.cbColorPwGen.Size = new System.Drawing.Size(271, 24);
+			this.cbColorPwGen.TabIndex = 5;
+			this.cbColorPwGen.Text = "Use colors in password generator";
+			this.cbColorPwGen.UseVisualStyleBackColor = true;
 			// 
 			// gEntryView
 			// 
@@ -369,6 +394,8 @@
 			this.cgActive.ResumeLayout(false);
 			this.cgActive.PerformLayout();
 			this.tpAdvanced.ResumeLayout(false);
+			this.gPasswordGenerator.ResumeLayout(false);
+			this.gPasswordGenerator.PerformLayout();
 			this.gEntryView.ResumeLayout(false);
 			this.gEntryView.PerformLayout();
 			this.ResumeLayout(false);
@@ -387,6 +414,8 @@
 		private System.Windows.Forms.TabControl tabControl1;
 		private System.Windows.Forms.TabPage tpSettings;
 		private System.Windows.Forms.TabPage tpAdvanced;
+		private System.Windows.Forms.GroupBox gPasswordGenerator;
+		internal System.Windows.Forms.CheckBox cbColorPwGen;
 		private System.Windows.Forms.GroupBox gEntryView;
 		internal System.Windows.Forms.CheckBox cbSinglePwDisplay;
 		internal System.Windows.Forms.CheckBox cbColorEntryViewKeepBackgroundColor;

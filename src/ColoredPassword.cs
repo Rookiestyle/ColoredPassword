@@ -228,6 +228,49 @@ namespace ColoredPassword
 		private void OnWindowAdded(object sender, GwmWindowEventArgs e)
 		{
 			if (e.Form is KeePass.Forms.KeyPromptForm) e.Form.Shown += OnKeyPromptFormShown;
+			else if (e.Form is KeePass.Forms.PwGeneratorForm) e.Form.Shown += OnPwGeneratorFormShown;
+		}
+
+		//Color passwords in password generator
+		private void OnPwGeneratorFormShown(object sender, EventArgs e)
+		{
+			(sender as Form).Shown -= OnPwGeneratorFormShown;
+			if (!ColorConfig.Active) return;
+			if (!ColorConfig.ColorPwGen) return;
+			KeePass.Forms.PwGeneratorForm pg = sender as KeePass.Forms.PwGeneratorForm;
+			TextBox tb = Tools.GetControl("m_tbPreview", pg) as TextBox;
+			if (tb == null)
+			{
+				PluginDebug.AddError("Could not locate m_tbPreview", 0);
+				return;
+			}
+			ColorTextBox rtb = new ColorTextBox();
+			rtb.Name = "ColoredPassword_" + tb.Name;
+			rtb.Left = tb.Left;
+			rtb.Top = tb.Top;
+			rtb.Width = tb.Width;
+			rtb.Height = tb.Height;
+			rtb.ColorBackground = false;
+			rtb.Multiline = tb.Multiline;
+			rtb.ReadOnly = tb.ReadOnly;
+			rtb.WordWrap = tb.WordWrap;
+			rtb.ScrollBars = (RichTextBoxScrollBars)tb.ScrollBars;
+			tb.Tag = rtb;
+			tb.Visible = false;
+			tb.Parent.Controls.Add(rtb);
+			tb.TextChanged += Tb_TextChanged;
+		}
+
+		private void Tb_TextChanged(object sender, EventArgs e)
+		{
+			TextBox tb = sender as TextBox;
+			ColorTextBox rtb = tb.Tag as ColorTextBox;
+			if (rtb == null)
+			{
+				tb.Visible = true;
+				return;
+			}
+			rtb.Lines = tb.Lines;
 		}
 
 		//Show error message if TypeOverride is not possible
@@ -267,6 +310,7 @@ namespace ColoredPassword
 			o.cbColorEntryView.Checked = ColorConfig.ColorEntryView;
 			o.cbColorEntryViewKeepBackgroundColor.Checked = ColorConfig.ListViewKeepBackgroundColor;
 			o.cbSinglePwDisplay.Checked = ColorConfig.SinglePwDisplayActive;
+			o.cbColorPwGen.Checked = ColorConfig.ColorPwGen;
 			o.ctbExample.ColorText();
 			ColorConfig.Testmode = true;
 		}
@@ -294,6 +338,7 @@ namespace ColoredPassword
 			ColorConfig.ColorEntryView = o.cbColorEntryView.Checked;
 			ColorConfig.ListViewKeepBackgroundColor = o.cbColorEntryViewKeepBackgroundColor.Checked;
 			SinglePwDisplay.Enabled = ColorConfig.SinglePwDisplayActive = o.cbSinglePwDisplay.Checked;
+			ColorConfig.ColorPwGen = o.cbColorPwGen.Checked;
 			ColorConfig.Write();
 			if (ColorConfig.Active) ColorPasswords(ColorConfig.Active);
 		}
