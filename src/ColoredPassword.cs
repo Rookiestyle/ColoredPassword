@@ -254,6 +254,7 @@ namespace ColoredPassword
 			rtb.Multiline = tb.Multiline;
 			rtb.ReadOnly = tb.ReadOnly;
 			rtb.WordWrap = tb.WordWrap;
+			rtb.Font = tb.Font;
 			rtb.ScrollBars = (RichTextBoxScrollBars)tb.ScrollBars;
 			tb.Tag = rtb;
 			tb.Visible = false;
