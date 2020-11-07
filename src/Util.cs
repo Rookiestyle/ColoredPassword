@@ -8,7 +8,6 @@ using System.Text;
 
 namespace ColoredPassword
 {
-
 	internal static class ColorConfig
 	{
 		private static AceCustomConfig m_Config = KeePass.Program.Config.CustomConfig;
