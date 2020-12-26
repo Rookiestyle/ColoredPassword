@@ -69,7 +69,7 @@ namespace ColoredPassword
 		{
 			AceColumn colPw = KeePass.Program.Config.MainWindow.FindColumn(AceColumnType.Password);
 			string m = string.Empty;
-			if (((colPw == null) || colPw.HideWithAsterisks) && !SinglePwDisplay.PasswordShown(e.ItemIndex))
+			if (((colPw == null) || colPw.HideWithAsterisks) && !SinglePwDisplay.PasswordShown(e.Item))
 			{
 				//Let the OS draw in case no other handlers exist
 				//If other handlers exist, we pass their value for DrawDefault

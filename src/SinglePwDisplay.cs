@@ -89,7 +89,7 @@ namespace ColoredPassword
 			}
 			foreach (ListViewItem lvi in EntriesListView.Items)
 			{
-				if (!PasswordShown(lvi.Index)) continue;
+				if (!PasswordShown(lvi)) continue;
 				if (lvi.SubItems[iPwColIndex].Text != KeePassLib.PwDefs.HiddenPassword) continue;
 				lvi.SubItems[iPwColIndex].Text = ((PwListItem)lvi.Tag).Entry.Strings.ReadSafe(KeePassLib.PwDefs.PasswordField);
 			}
@@ -170,11 +170,13 @@ namespace ColoredPassword
 			return -1;
 		}
 
-		public static bool PasswordShown(int idx)
+		public static bool PasswordShown(ListViewItem lvi)
 		{
 			if (!Enabled) return false;
-			if (EntriesListView.Items.Count < idx) return false;
-			KeePassLib.PwEntry pe = ((PwListItem)EntriesListView.Items[idx].Tag).Entry;
+			if (lvi == null) return false;
+			if (!(lvi.Tag is PwListItem)) return false;
+			KeePassLib.PwEntry pe = (lvi.Tag as PwListItem).Entry;
+			
 			if (pe == null) return false;
 			SingleItem si = m_lItems.Find(x => x.Entry.Uuid.Equals(pe.Uuid));
 			return si != null && !si.Hidden;
