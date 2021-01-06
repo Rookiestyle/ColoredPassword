@@ -273,6 +273,11 @@ namespace ColoredPassword
 
 		protected void Paste(string strData)
 		{
+			if (this.SelectionLength > 0)
+			{
+				this.SelectedText = strData;
+				return;
+			}
 			int nCursorPos = this.SelectionStart;
 			string strPre = this.Text.Substring(0, nCursorPos);
 			string strPost = this.Text.Substring(nCursorPos);
