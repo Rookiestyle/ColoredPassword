@@ -41,7 +41,7 @@ namespace PluginTranslation
 		public static readonly string Error = @"Overriding SecureTextBoxEx not possible, wrong basetype: {0}";
 		public static readonly string ColorEntryView = @"Color passwords in entry list";
 		public static readonly string ColorEntryViewKeepBackgroundColor = @"Do NOT adjust background color in entry list";
-		public static readonly string SinglePwDisplay = @"Single click passwort to unhide";
+		public static readonly string SinglePwDisplay = @"Single click password to unhide";
 		public static readonly string ColorPwGenDisplay = @"Color passwords in password generator";
 		#endregion
 
