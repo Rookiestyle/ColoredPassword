@@ -64,12 +64,12 @@ namespace ColoredPassword
 
 		private void ColoredSecureTextBox_SizeChanged(object sender, EventArgs e)
 		{
-			if (!m_bKeeTheme) m_text.Size = Size;
+			m_text.Size = Size;
 		}
 
 		private void ColoredSecureTextBox_LocationChanged(object sender, EventArgs e)
 		{
-			if (!m_bKeeTheme) m_text.Location = Location;
+			AdjustLocation();
 		}
 
 		private void UpdateEnabledState(object sender, EventArgs e)
@@ -142,18 +142,13 @@ namespace ColoredPassword
 			Parent.SuspendLayout();
 			Parent.Controls.Add(m_text);
 			m_text.Parent = Parent;
-			foreach (Control c in Parent.Controls)
-			{
-				if (c.TabIndex > TabIndex)
-					c.TabIndex++;
-			}
 			m_text.TabStop = true;
-			m_text.TabIndex = TabIndex + 1;
+			m_text.TabIndex = TabIndex;
 			Parent.ResumeLayout();
 			Parent.PerformLayout();
 		}
 
-		public override void EnableProtection(bool bEnable)
+        public override void EnableProtection(bool bEnable)
 		{
 			PluginDebug.AddInfo(Name + " Protect password display: " + bEnable.ToString());
 			m_text.TextChanged -= ColorTextChanged;
@@ -170,6 +165,7 @@ namespace ColoredPassword
 				Focus();
 				Select(m_text.SelectionStart, m_text.SelectionLength);
 				m_text.Visible = false;
+				m_text.TabStop = false;
 				if (m_bKeeTheme) m_text.Parent.Visible = false;
 			}
 			else
@@ -179,12 +175,14 @@ namespace ColoredPassword
 				//ColorConfig.BackColorDefault = BackColor;
 				m_text.RightToLeft = RightToLeft;
 				m_text.Size = Size;
-				if (!m_bKeeTheme) m_text.Location = Location;
+				AdjustLocation();
 				m_text.Font = Font;
 				m_text.Visible = true;
+				m_text.TabStop = true;
 				if (m_bKeeTheme) m_text.Parent.Visible = true;
 				m_text.Text = Text;
 				m_text.ReadOnly = ReadOnly;
+				Visible = false;
 				TabStop = false;
 				if (!m_bReadOnlySaved)
 				{
@@ -204,6 +202,17 @@ namespace ColoredPassword
 				else m_text.BringToFront();
 				if (KeePassLib.Native.NativeLib.IsUnix()) m_text.ColorText();
 			}
+		}
+
+        private void AdjustLocation()
+        {
+			//If KeeTheme is active, the ColoredTextBox is contained in 
+			//a RichTextBoxDecorator
+
+			//Change the location of the RichTextBoxDecorator if KeeTheme is active
+			//Change the location of the ColoredTextBox otherwise
+			if (m_bKeeTheme) m_text.Parent.Location = Location;
+			else m_text.Location = Location;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -227,8 +236,22 @@ namespace ColoredPassword
 
 	public class ColorTextBox : RichTextBox
 	{
-		public bool ColorBackground = true;
-		protected override void Dispose(bool disposing)
+		private bool m_bColorBackground = true;
+		private bool? m_bKeeTheme = null;
+		public bool ColorBackground
+        {
+            get { return GetColorBackground(); }
+			set { m_bColorBackground = value; }
+        }
+
+        private bool GetColorBackground()
+        {
+			if (!m_bKeeTheme.HasValue && Parent != null) m_bKeeTheme= Parent.GetType().FullName.Contains("KeeTheme");
+			if (!m_bKeeTheme.HasValue) return m_bColorBackground;
+			return !m_bKeeTheme.Value && m_bColorBackground;
+		}
+
+        protected override void Dispose(bool disposing)
 		{
 			base.Dispose(disposing);
 			if (disposing && (ContextMenuStrip != null) && !ContextMenuStrip.IsDisposed)

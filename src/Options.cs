@@ -41,12 +41,8 @@ namespace ColoredPassword
 			cbColorEntryViewKeepBackgroundColor.Text = PluginTranslate.ColorEntryViewKeepBackgroundColor;
 			cbSinglePwDisplay.Text = PluginTranslate.SinglePwDisplay;
 			cbColorPwGen.Text = PluginTranslate.ColorPwGenDisplay;
-			try
-			{
-				var f = KeePass.Program.Translation.Forms.Find(x => x.FullName == "KeePass.Forms.PwGeneratorForm");
-				gPasswordGenerator.Text = f.Window.Text;
-			}
-			catch { }
+			var f = KeePass.Program.Translation.Forms.Find(x => x.FullName == "KeePass.Forms.PwGeneratorForm");
+			if (f != null && f.Window != null) gPasswordGenerator.Text = f.Window.Text;
 		}
 
 		private void OnColorSelect(object sender, EventArgs e)
