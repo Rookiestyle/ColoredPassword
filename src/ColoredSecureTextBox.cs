@@ -56,7 +56,7 @@ namespace ColoredPassword
 			LocationChanged += ColoredSecureTextBox_LocationChanged;
 			SizeChanged += ColoredSecureTextBox_SizeChanged;
 			//Focus change is no longer triggered since KeePass 2.49
-			Enter += OnFocusChangeRequired; 
+			Enter += OnFocusChangeRequired;
 		}
 
 		private void M_text_ParentChanged(object sender, EventArgs e)
@@ -67,6 +67,7 @@ namespace ColoredPassword
 		private void ColoredSecureTextBox_SizeChanged(object sender, EventArgs e)
 		{
 			m_text.Size = Size;
+			if (m_bKeeTheme) m_text.Parent.Size = Size;
 		}
 
 		private void ColoredSecureTextBox_LocationChanged(object sender, EventArgs e)
@@ -150,11 +151,12 @@ namespace ColoredPassword
 			Parent.PerformLayout();
 		}
 
-        public override void EnableProtection(bool bEnable)
+		public override void EnableProtection(bool bEnable)
 		{
 			PluginDebug.AddInfo(Name + " Protect password display: " + bEnable.ToString());
 			m_text.TextChanged -= ColorTextChanged;
 			base.EnableProtection(bEnable);
+			m_text.Name = Name + "_RTB";
 			if (bEnable)
 			{
 				Visible = true;
@@ -179,9 +181,11 @@ namespace ColoredPassword
 				m_text.Size = Size;
 				AdjustLocation();
 				m_text.Font = Font;
-				m_text.Visible = true;
-				m_text.TabStop = true;
-				if (m_bKeeTheme) m_text.Parent.Visible = true;
+				//If password repeat is off and KeeTheme is active => Hide RichTextBox, will not be shown properly otherwise
+				bool bVisible = Enabled || !(Name.Contains("Repeat") && m_bKeeTheme);
+				if (m_bKeeTheme) m_text.Parent.Visible = bVisible;
+				m_text.Visible = bVisible;
+				m_text.TabStop = bVisible;
 				m_text.Text = Text;
 				m_text.ReadOnly = ReadOnly;
 				Visible = false;
@@ -206,8 +210,8 @@ namespace ColoredPassword
 			}
 		}
 
-        private void AdjustLocation()
-        {
+		private void AdjustLocation()
+		{
 			//If KeeTheme is active, the ColoredTextBox is contained in 
 			//a RichTextBoxDecorator
 
@@ -236,77 +240,43 @@ namespace ColoredPassword
 		}
 	}
 
-	public class ColorTextBox : RichTextBox
+	public class ColorTextBox : CustomRichTextBoxEx
 	{
 		private bool m_bColorBackground = true;
 		private bool? m_bKeeTheme = null;
-		public bool ColorBackground
-        {
-            get { return GetColorBackground(); }
-			set { m_bColorBackground = value; }
-        }
 
-        private bool GetColorBackground()
-        {
-			if (!m_bKeeTheme.HasValue && Parent != null) m_bKeeTheme= Parent.GetType().FullName.Contains("KeeTheme");
+		private RichTextBoxContextMenu m_ctx = new RichTextBoxContextMenu();
+
+		public bool ColorBackground
+		{
+			get { return GetColorBackground(); }
+			set { m_bColorBackground = value; }
+		}
+
+		private bool GetColorBackground()
+		{
+			if (!m_bKeeTheme.HasValue && Parent != null) m_bKeeTheme = Parent.GetType().FullName.Contains("KeeTheme");
 			if (!m_bKeeTheme.HasValue) return m_bColorBackground;
 			return !m_bKeeTheme.Value && m_bColorBackground;
 		}
 
-        protected override void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
 			base.Dispose(disposing);
-			if (disposing && (ContextMenuStrip != null) && !ContextMenuStrip.IsDisposed)
-			{
-				ContextMenuStrip.Opening -= ContextMenuStrip_Opening;
-				ContextMenuStrip.Dispose();
-				ContextMenuStrip = null;
-			}
+			m_ctx.Detach();
 		}
 
 		public ColorTextBox() : base()
 		{
 			Multiline = false;
-
-			//Keep ContextMenuStrip_Opening in sync with this
-			ContextMenuStrip = new ContextMenuStrip();
-			ToolStripMenuItem m = new ToolStripMenuItem() { Text = KeePass.Resources.KPRes.Cut, Name = "CM_Cut" };
-			m.Click += (o, e) => Cut();
-			ContextMenuStrip.Items.Add(m);
-			m = new ToolStripMenuItem() { Text = KeePass.Resources.KPRes.Copy, Name = "CM_Copy" };
-			m.Click += (o, e) => Copy();
-			ContextMenuStrip.Items.Add(m);
-			m = new ToolStripMenuItem() { Text = KeePass.Resources.KPRes.Paste, Name = "CM_Paste" };
-			m.Click += (o, e) => Paste(Clipboard.GetText());
-			ContextMenuStrip.Items.Add(m);
-			m = new ToolStripMenuItem() { Text = KeePass.Resources.KPRes.Delete, Name = "CM_Delete" };
-			m.Click += (o, e) =>
-			{ SelectedText = string.Empty; };
-			ContextMenuStrip.Items.Add(m);
-			ContextMenuStrip.Items.Add(new ToolStripSeparator());
-			m = new ToolStripMenuItem() { Text = KeePass.Resources.KPRes.SelectAll, Name = "CM_SelectAll" };
-			m.Click += (o, e) => { Select(0, Text.Length); };
-			ContextMenuStrip.Items.Add(m);
-			ContextMenuStrip.Opening += ContextMenuStrip_Opening;
+			SimpleTextOnly = true;
+			m_ctx.Attach(this, null);
 		}
 
 		protected override void OnTextChanged(EventArgs e)
 		{
 			base.OnTextChanged(e);
 			if (!DesignMode) ColorText();
-		}
-
-		protected void Paste(string strData)
-		{
-			if (this.SelectionLength > 0)
-			{
-				this.SelectedText = strData;
-				return;
-			}
-			int nCursorPos = this.SelectionStart;
-			string strPre = this.Text.Substring(0, nCursorPos);
-			string strPost = this.Text.Substring(nCursorPos);
-			this.Text = strPre + strData + strPost;
 		}
 
 		public static List<CharRange> GetRanges(string s)
@@ -380,19 +350,6 @@ namespace ColoredPassword
 			else PluginDebug.AddInfo(Name + " Color password", 0, lMsg.ToArray());
 
 			Select(nCursorPos, 0); //restore cursor position
-		}
-
-		private void ContextMenuStrip_Opening(object sender, EventArgs e)
-		{
-			//Mono does not suppport 'searchAllChildren' for ToolStripMenuItem
-			ContextMenuStrip.Items[0].Enabled = !string.IsNullOrEmpty(SelectedText); //Cut
-			ContextMenuStrip.Items[1].Enabled = !string.IsNullOrEmpty(SelectedText); //Copy
-			ContextMenuStrip.Items[2].Enabled = Clipboard.ContainsText(); //Paste
-			ContextMenuStrip.Items[3].Enabled = !string.IsNullOrEmpty(SelectedText); //Delete
-
-			//ContextMenuStrip.Items[4] = Separator
-
-			ContextMenuStrip.Items[5].Enabled = !string.IsNullOrEmpty(SelectedText); //Select All
 		}
 	}
 }
