@@ -55,6 +55,8 @@ namespace ColoredPassword
 			m_text.Location = Location;
 			LocationChanged += ColoredSecureTextBox_LocationChanged;
 			SizeChanged += ColoredSecureTextBox_SizeChanged;
+			//Focus change is no longer triggered since KeePass 2.49
+			Enter += OnFocusChangeRequired; 
 		}
 
 		private void M_text_ParentChanged(object sender, EventArgs e)
