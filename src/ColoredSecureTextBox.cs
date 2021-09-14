@@ -43,6 +43,8 @@ namespace ColoredPassword
 
 		private bool m_bKeeTheme = false;
 
+		private Form m_form = null;
+
 		public ColoredSecureTextBox()
 		{
 			if (DesignMode) return;
@@ -62,7 +64,33 @@ namespace ColoredPassword
 		private void M_text_ParentChanged(object sender, EventArgs e)
 		{
 			m_bKeeTheme = (m_text.Parent != null) && m_text.Parent.GetType().FullName.Contains("KeeTheme");
-		}
+
+			//https://github.com/Rookiestyle/ColoredPassword/issues/11
+			//
+			//If passwords are shon in plaintext, ColoredPassword
+			//replaces the password text box with a RichTextBox
+			//
+			//KeePass itself checks m_tbPassword.CanFocus which is false
+			//in that case and by that, KeePass does not focuses the password field
+			if (m_form != null) m_form.Shown -= CorrectFocus;
+			m_form = FindForm() as KeePass.Forms.KeyPromptForm;
+			if (m_form == null) m_form = FindForm() as KeePass.Forms.KeyCreationForm;
+			if (m_form != null) m_form.Shown += CorrectFocus;
+        }
+
+		private void CorrectFocus(object sender, EventArgs e)
+        {
+			ulong uUIFlags = 0;
+			if (m_form is KeePass.Forms.KeyPromptForm)
+				uUIFlags = KeePass.Program.Config.UI.KeyPromptFlags;
+			else if (m_form is KeePass.Forms.KeyCreationForm)
+				uUIFlags = KeePass.Program.Config.UI.KeyCreationFlags;
+			else return;
+
+			if ((uUIFlags & (ulong)KeePass.App.Configuration.AceKeyUIFlags.UncheckHidePassword) == 0) return;
+
+			if (Enabled) UIUtil.ResetFocus(this, m_form, true);
+        }
 
 		private void ColoredSecureTextBox_SizeChanged(object sender, EventArgs e)
 		{
