@@ -33,15 +33,45 @@ namespace PluginTranslation
 		private static string LanguageIso6391 = string.Empty;
 		#region Definitions of translated texts go here
 		public const string PluginName = "Colored Password";
+		/// <summary>
+		/// Active
+		/// </summary>
 		public static readonly string Active = @"Active";
+		/// <summary>
+		/// Different color for lowercase letters
+		/// </summary>
 		public static readonly string LowercaseDifferentColor = @"Different color for lowercase letters";
+		/// <summary>
+		/// Colors for digits
+		/// </summary>
 		public static readonly string CharDigit = @"Colors for digits";
+		/// <summary>
+		/// Colors for special chars
+		/// </summary>
 		public static readonly string CharSpecial = @"Colors for special chars";
+		/// <summary>
+		/// Example text / test text
+		/// </summary>
 		public static readonly string Example = @"Example text / test text";
+		/// <summary>
+		/// Overriding SecureTextBoxEx not possible, wrong basetype: {0}
+		/// </summary>
 		public static readonly string Error = @"Overriding SecureTextBoxEx not possible, wrong basetype: {0}";
+		/// <summary>
+		/// Color passwords in entry list
+		/// </summary>
 		public static readonly string ColorEntryView = @"Color passwords in entry list";
+		/// <summary>
+		/// Do NOT adjust background color in entry list
+		/// </summary>
 		public static readonly string ColorEntryViewKeepBackgroundColor = @"Do NOT adjust background color in entry list";
+		/// <summary>
+		/// Single click password to unhide
+		/// </summary>
 		public static readonly string SinglePwDisplay = @"Single click password to unhide";
+		/// <summary>
+		/// Color passwords in password generator
+		/// </summary>
 		public static readonly string ColorPwGenDisplay = @"Color passwords in password generator";
 		#endregion
 
