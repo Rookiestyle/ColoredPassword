@@ -64,14 +64,14 @@ namespace ColoredPassword
 			if (Enabled == value) return;
 			if (value)
 			{
-				if (EntriesListView != null) EntriesListView.Click += OnLVEntriesClick;
+				if (EntriesListView != null) EntriesListView.MouseClick += OnMouseClick;;
 				if (EntriesListView != null) EntriesListView.DoubleClick += OnLVEntriesDoubleClick;
 				KeePass.Program.MainForm.UIStateUpdated += MainForm_UIStateUpdated;
 			}
 			else
 			{
 				Clear(true);
-				if (EntriesListView != null) EntriesListView.Click -= OnLVEntriesClick;
+				if (EntriesListView != null) EntriesListView.MouseClick -= OnMouseClick; 
 				if (EntriesListView != null) EntriesListView.DoubleClick -= OnLVEntriesDoubleClick;
 				KeePass.Program.MainForm.UIStateUpdated -= MainForm_UIStateUpdated;
 			}
@@ -191,9 +191,10 @@ namespace ColoredPassword
 		}
 
 		private static Dictionary<KeePassLib.PwUuid, Timer> m_CheckDoubleClick = new Dictionary<KeePassLib.PwUuid, Timer>();
-		private static void OnLVEntriesClick(object sender, EventArgs e)
+		private static void OnMouseClick(object sender, MouseEventArgs e)
 		{
 			if (!Enabled) return;
+			if (e.Button != MouseButtons.Left) return;
 			KeePassLib.PwEntry pe = GetEntryFromClick();
 			if (pe == null) return;
 			Timer t;
