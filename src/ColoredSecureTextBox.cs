@@ -179,9 +179,26 @@ namespace ColoredPassword
 			Parent.PerformLayout();
 		}
 
+		//KeeTheme usage of DwmSetWindowAttribute in combination with toggline the form's borderstyle
+		//results in the CAPS LOCK warning tooltip to be shown forever
+		//
+		//This happens if
+		// - password is shown unprotected right away in the key promp / key creation form
+		// - and KeeTheme is installed
+		// - and KeeTheme is enabled
+		//
+		//To bypasss this, we perform
+		private bool m_bKeeThemeW10Delay = true;
+		private bool? m_bDoEnable = null;
 		public override void EnableProtection(bool bEnable)
 		{
 			PluginDebug.AddInfo(Name + " Protect password display: " + bEnable.ToString());
+			if (KeeThemeDelayRequired())
+            {
+				HandleKeeThemeDelay(bEnable);
+				base.EnableProtection(bEnable);
+				return;
+            }
 			m_text.TextChanged -= ColorTextChanged;
 			base.EnableProtection(bEnable);
 			m_text.Name = Name + "_RTB";
@@ -238,7 +255,40 @@ namespace ColoredPassword
 			}
 		}
 
-		private void AdjustLocation()
+        private void HandleKeeThemeDelay(bool bEnable)
+        {
+			if (!m_bDoEnable.HasValue)
+			{
+				m_form.Shown += (o, e) =>
+				{
+					m_bKeeThemeW10Delay = false;
+					EnableProtection(m_bDoEnable.HasValue ? m_bDoEnable.Value : true);
+				};
+			}
+			m_bDoEnable = bEnable;
+		}
+
+		private bool KeeThemeDelayRequired()
+        {
+			if (!m_bKeeThemeW10Delay) return false;
+			if (!m_bKeeTheme) return false;
+
+			ulong uUIFlags = 0;
+			if (m_form is KeePass.Forms.KeyPromptForm)
+				uUIFlags = KeePass.Program.Config.UI.KeyPromptFlags;
+			else if (m_form is KeePass.Forms.KeyCreationForm)
+				uUIFlags = KeePass.Program.Config.UI.KeyCreationFlags;
+			else return false;
+
+			//password not shown in plaintext
+			if ((uUIFlags & (ulong)KeePass.App.Configuration.AceKeyUIFlags.UncheckHidePassword) == 0) return false;
+
+			//we COULD check whether KeeTheme is active
+			//we ARE lazy and don't do that
+			return true;
+        }
+
+        private void AdjustLocation()
 		{
 			//If KeeTheme is active, the ColoredTextBox is contained in 
 			//a RichTextBoxDecorator
