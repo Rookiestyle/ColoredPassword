@@ -43,6 +43,9 @@ namespace ColoredPassword
 			cbColorPwGen.Text = PluginTranslate.ColorPwGenDisplay;
 			var f = KeePass.Program.Translation.Forms.Find(x => x.FullName == "KeePass.Forms.PwGeneratorForm");
 			if (f != null && f.Window != null) gPasswordGenerator.Text = f.Window.Text;
+
+			gSyncColorsWithPrintForm.Text = KeePass.Resources.KPRes.Print;
+			cbSyncColorsWithPrintForm.Text = PluginTranslate.SyncColors;
 		}
 
 		private void OnColorSelect(object sender, EventArgs e)
@@ -78,6 +81,7 @@ namespace ColoredPassword
 		private void cgActive_CheckedChanged(object sender, RookieUI.CheckedGroupCheckEventArgs e)
 		{
 			foreach (Control c in tpAdvanced.Controls) c.Enabled = cgActive.Checked;
+			if (PluginTools.Tools.KeePassVersion < ColorConfig.KP_2_51) gSyncColorsWithPrintForm.Enabled = false;
 		}
 	}
 }

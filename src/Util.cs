@@ -16,6 +16,14 @@ namespace ColoredPassword
 		public static bool ColorEntryView = true;
 		public static bool SinglePwDisplayActive = true;
 		public static bool ColorPwGen = true;
+
+		public static Version KP_2_51 = new Version(2, 51);
+
+		public static bool SyncColorsWithPrintForm
+        {
+			get { return m_Config.GetBool("ColoredPassword.SyncColorsWithPrintForm", true); }
+			set { m_Config.SetBool("ColoredPassword.SyncColorsWithPrintForm", value); }
+		}
 		public static bool Testmode
 		{
 			get { return m_Testmode; }

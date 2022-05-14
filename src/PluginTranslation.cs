@@ -73,6 +73,10 @@ namespace PluginTranslation
 		/// Color passwords in password generator
 		/// </summary>
 		public static readonly string ColorPwGenDisplay = @"Color passwords in password generator";
+		/// <summary>
+		/// Snychronize font colors
+		/// </summary>
+		public static readonly string SyncColors = @"Snychronize font colors";
 		#endregion
 
 		#region NO changes in this area

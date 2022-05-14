@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using KeePass.App.Configuration;
 using KeePass.Plugins;
@@ -229,10 +230,70 @@ namespace ColoredPassword
 		{
 			if (e.Form is KeePass.Forms.KeyPromptForm) e.Form.Shown += OnKeyPromptFormShown;
 			else if (e.Form is KeePass.Forms.PwGeneratorForm) e.Form.Shown += OnPwGeneratorFormShown;
+			else if (e.Form is KeePass.Forms.PrintForm && Tools.KeePassVersion >= ColorConfig.KP_2_51) e.Form.Shown += OnPrintFormShown;
 		}
 
-		//Color passwords in password generator
-		private void OnPwGeneratorFormShown(object sender, EventArgs e)
+        private void OnPrintFormShown(object sender, EventArgs e)
+        {
+			var fPrint = sender as KeePass.Forms.PrintForm;
+			if (fPrint == null) return;
+			fPrint.Shown -= OnPrintFormShown;
+			if (!ColorConfig.Active) return;
+			if (!ColorConfig.SyncColorsWithPrintForm) return;
+			fPrint.FormClosed += OnPrintFormClosed;
+			//Adjust ColorButtonEx
+			Button cbe = Tools.GetControl("m_btnColorPU", fPrint) as Button;
+			if (cbe != null) SetColorButtonColor(cbe, ColorConfig.ForeColorDefault);
+			cbe = Tools.GetControl("m_btnColorPL", sender as Form) as Button;
+			if (cbe != null)
+			{
+				if (ColorConfig.LowercaseDifferent) SetColorButtonColor(cbe, ColorConfig.ForeColorLower);
+				else SetColorButtonColor(cbe, ColorConfig.ForeColorDefault);
+			}
+			cbe = Tools.GetControl("m_btnColorPD", sender as Form) as Button;
+			if (cbe != null) SetColorButtonColor(cbe, ColorConfig.ForeColorDigit);
+			cbe = Tools.GetControl("m_btnColorPO", sender as Form) as Button;
+			if (cbe != null) SetColorButtonColor(cbe, ColorConfig.ForeColorSpecial);
+
+			var mUpdateWebBrowser = fPrint.GetType().GetMethod("UpdateWebBrowser", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+			if (mUpdateWebBrowser != null) mUpdateWebBrowser.Invoke(fPrint, new object[] { false });
+		}
+
+        private void OnPrintFormClosed(object sender, FormClosedEventArgs e)
+        {
+			var fPrint = sender as KeePass.Forms.PrintForm;
+			if (fPrint == null) return;
+			fPrint.FormClosed -= OnPrintFormClosed;
+			if (fPrint.DialogResult != DialogResult.OK) return;
+
+			Button cbe = Tools.GetControl("m_btnColorPU", fPrint) as Button;
+			if (cbe != null) ColorConfig.ForeColorDefault = GetColorButtonColor(cbe, ColorConfig.ForeColorDefault);
+			cbe = Tools.GetControl("m_btnColorPL", sender as Form) as Button;
+			if (cbe != null) ColorConfig.ForeColorLower = GetColorButtonColor(cbe, ColorConfig.ForeColorLower);
+			cbe = Tools.GetControl("m_btnColorPD", sender as Form) as Button;
+			if (cbe != null) ColorConfig.ForeColorDigit = GetColorButtonColor(cbe, ColorConfig.ForeColorDigit);
+			cbe = Tools.GetControl("m_btnColorPO", sender as Form) as Button;
+			if (cbe != null) ColorConfig.ForeColorSpecial = GetColorButtonColor(cbe, ColorConfig.ForeColorSpecial);
+		}
+
+        private Color GetColorButtonColor(Button cbe, Color cDefault)
+        {
+			var pColor = cbe.GetType().GetProperty("SelectedColor");
+			if (pColor == null) return cDefault;
+			object o = pColor.GetValue(cbe, null);
+			if (!(o is Color)) return cDefault;
+			return (Color)o;
+		}
+
+		private void SetColorButtonColor(Button bPU, Color cTextcolor)
+        {
+			var pColor = bPU.GetType().GetProperty("SelectedColor");
+			if (pColor == null) return;
+			pColor.SetValue(bPU, cTextcolor, null);
+		}
+
+        //Color passwords in password generator
+        private void OnPwGeneratorFormShown(object sender, EventArgs e)
 		{
 			(sender as Form).Shown -= OnPwGeneratorFormShown;
 			if (!ColorConfig.Active) return;
@@ -310,6 +371,7 @@ namespace ColoredPassword
 			o.bBackColorLower.BackColor = ColorConfig.BackColorLower;
 			o.cbColorEntryView.Checked = ColorConfig.ColorEntryView;
 			o.cbColorEntryViewKeepBackgroundColor.Checked = ColorConfig.ListViewKeepBackgroundColor;
+			o.cbSyncColorsWithPrintForm.Checked = ColorConfig.SyncColorsWithPrintForm;
 			o.cbSinglePwDisplay.Checked = ColorConfig.SinglePwDisplayActive;
 			o.cbColorPwGen.Checked = ColorConfig.ColorPwGen;
 			o.ctbExample.ColorText();
@@ -338,6 +400,7 @@ namespace ColoredPassword
 
 			ColorConfig.ColorEntryView = o.cbColorEntryView.Checked;
 			ColorConfig.ListViewKeepBackgroundColor = o.cbColorEntryViewKeepBackgroundColor.Checked;
+			ColorConfig.SyncColorsWithPrintForm = o.cbSyncColorsWithPrintForm.Checked;
 			SinglePwDisplay.Enabled = ColorConfig.SinglePwDisplayActive = o.cbSinglePwDisplay.Checked;
 			ColorConfig.ColorPwGen = o.cbColorPwGen.Checked;
 			ColorConfig.Write();
