@@ -76,21 +76,20 @@ namespace ColoredPassword
 			m_form = FindForm() as KeePass.Forms.KeyPromptForm;
 			if (m_form == null) m_form = FindForm() as KeePass.Forms.KeyCreationForm;
 			if (m_form != null) m_form.Shown += CorrectFocus;
-        }
+		}
 
 		private void CorrectFocus(object sender, EventArgs e)
-        {
-			ulong uUIFlags = 0;
-			if (m_form is KeePass.Forms.KeyPromptForm)
-				uUIFlags = KeePass.Program.Config.UI.KeyPromptFlags;
-			else if (m_form is KeePass.Forms.KeyCreationForm)
-				uUIFlags = KeePass.Program.Config.UI.KeyCreationFlags;
-			else return;
+		{
+			if (!Enabled) return;
+			if (m_form == null) return;
 
-			if ((uUIFlags & (ulong)KeePass.App.Configuration.AceKeyUIFlags.UncheckHidePassword) == 0) return;
-
-			if (Enabled) UIUtil.ResetFocus(this, m_form, true);
-        }
+			UIUtil.ResetFocus(this, m_form);
+			if (Name.Contains("Repeat"))
+			{
+				var c = Tools.GetControl(Name.Replace("Repeat", string.Empty), m_form);
+				if (c != null) UIUtil.ResetFocus(c, m_form, true); 
+			} 
+		}
 
 		private void ColoredSecureTextBox_SizeChanged(object sender, EventArgs e)
 		{
@@ -179,29 +178,25 @@ namespace ColoredPassword
 			Parent.PerformLayout();
 		}
 
-		//KeeTheme usage of DwmSetWindowAttribute in combination with toggline the form's borderstyle
-		//results in the CAPS LOCK warning tooltip to be shown forever
+		//Don't show ColorTextBox if
+		//  - m_form is set (KeyPromptForm or KeyCreationForm)
+		//  AND
+		//  - form.Shown event has not been raised yet
 		//
-		//This happens if
-		// - password is shown unprotected right away in the key promp / key creation form
-		// - and KeeTheme is installed
-		// - and KeeTheme is enabled
-		//
-		//To bypasss this, we perform
-		private bool m_bKeeThemeW10Delay = true;
-		private bool? m_bDoEnable = null;
+		//This can result in a wrong CAPS LOCK warning tooltip - cf. https://github.com/Rookiestyle/ColoredPassword/issues/15
+		private bool m_bKeyFormShown = false;
+		private bool? m_bRememberedProtectionState = null;
 		public override void EnableProtection(bool bEnable)
 		{
 			PluginDebug.AddInfo(Name + " Protect password display: " + bEnable.ToString());
-			if (KeeThemeDelayRequired())
-            {
-				HandleKeeThemeDelay(bEnable);
-				base.EnableProtection(bEnable);
-				return;
-            }
 			m_text.TextChanged -= ColorTextChanged;
-			base.EnableProtection(bEnable);
 			m_text.Name = Name + "_RTB";
+			base.EnableProtection(bEnable);
+			if (WaitForFormShown())
+			{
+				RememberProtectionState(bEnable);
+				return;
+			}
 			if (bEnable)
 			{
 				Visible = true;
@@ -255,36 +250,25 @@ namespace ColoredPassword
 			}
 		}
 
-        private void HandleKeeThemeDelay(bool bEnable)
+        private void RememberProtectionState(bool bEnable)
         {
-			if (!m_bDoEnable.HasValue)
+			//Subscribe to event 'Shown' only once
+			if (!m_bRememberedProtectionState.HasValue)
 			{
 				m_form.Shown += (o, e) =>
 				{
-					m_bKeeThemeW10Delay = false;
-					EnableProtection(m_bDoEnable.HasValue ? m_bDoEnable.Value : true);
+					m_bKeyFormShown = true;
+					EnableProtection(m_bRememberedProtectionState.Value);
+					CorrectFocus(null, null);
 				};
 			}
-			m_bDoEnable = bEnable;
+			m_bRememberedProtectionState = bEnable;
 		}
 
-		private bool KeeThemeDelayRequired()
+		private bool WaitForFormShown()
         {
-			if (!m_bKeeThemeW10Delay) return false;
-			if (!m_bKeeTheme) return false;
-
-			ulong uUIFlags = 0;
-			if (m_form is KeePass.Forms.KeyPromptForm)
-				uUIFlags = KeePass.Program.Config.UI.KeyPromptFlags;
-			else if (m_form is KeePass.Forms.KeyCreationForm)
-				uUIFlags = KeePass.Program.Config.UI.KeyCreationFlags;
-			else return false;
-
-			//password not shown in plaintext
-			if ((uUIFlags & (ulong)KeePass.App.Configuration.AceKeyUIFlags.UncheckHidePassword) == 0) return false;
-
-			//we COULD check whether KeeTheme is active
-			//we ARE lazy and don't do that
+			if (m_bKeyFormShown) return false;
+			if (m_form == null) return false;
 			return true;
         }
 
