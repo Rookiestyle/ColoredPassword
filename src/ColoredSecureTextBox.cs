@@ -197,6 +197,18 @@ namespace ColoredPassword
 				RememberProtectionState(bEnable);
 				return;
 			}
+			try
+			{
+				//Use methods like Select, Focus sometimes results in an exception
+				//Happens in race conditions only when the form itself is disposed already
+				EnableProtectionInternal(bEnable);
+			}
+			catch { }
+		}
+
+		private void EnableProtectionInternal(bool bEnable)
+		{
+			if (!IsDisposed || Disposing) return;
 			if (bEnable)
 			{
 				Visible = true;

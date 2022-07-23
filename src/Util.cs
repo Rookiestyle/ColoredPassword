@@ -136,6 +136,30 @@ namespace ColoredPassword
 			get { return (int)m_Config.GetLong("ColoredPassword.ColorDifferenceThreshold", 26); }
 		}
 
+		//Some users manually change the config file
+		//This might result in ugly error messages / plugin behaviour otherwise
+		//cf. https://github.com/Rookiestyle/ColoredPassword/issues/17
+		private static Color GetConfigColor(string strID, string strDefault)
+		{
+			var s = m_Config.GetString(strID, strDefault);
+			if (s == null)
+			{
+				PluginTools.PluginDebug.AddError("Error reading color value", 0, new string[] { "ID: " + strID });
+				s = strDefault;
+			}
+			try
+			{
+				return NameToColor(s);
+			}
+			catch
+			{
+				PluginTools.PluginDebug.AddError("Error reading color value", 0, new string[] { "ID: " + strID, "Value: " + s });
+				if (strID.ToLowerInvariant().Contains("back")) s = "Window";
+				else s = "WindowText";
+			}
+			return NameToColor(s);
+		}
+		
 		public static void Read()
 		{
 			bool test = Testmode;
@@ -145,23 +169,15 @@ namespace ColoredPassword
 			Active = m_Config.GetBool(ConfigPrefix + "Active", true);
 			ColorEntryView = m_Config.GetBool(ConfigPrefix + "ColorEntryView", true);
 			ListViewKeepBackgroundColor = m_Config.GetBool(ConfigPrefix + "ListViewKeepBackgroundColor", true);
-			string help = m_Config.GetString(ConfigPrefix + "ForeColorDefault", "WindowText");
-			ForeColorDefault = NameToColor(help);
-			help = m_Config.GetString(ConfigPrefix + "BackColorDefault", "Window");
-			BackColorDefault = NameToColor(help);
-			help = m_Config.GetString(ConfigPrefix + "ForeColorDigit", "Red");
-			ForeColorDigit = NameToColor(help);
-			help = m_Config.GetString(ConfigPrefix + "BackColorDigit", "White");
-			BackColorDigit = NameToColor(help);
-			help = m_Config.GetString(ConfigPrefix + "ForeColorSpecial", "Green");
-			ForeColorSpecial = NameToColor(help);
-			help = m_Config.GetString(ConfigPrefix + "BackColorSpecial", "White");
-			BackColorSpecial = NameToColor(help);
+			ForeColorDefault = GetConfigColor(ConfigPrefix + "ForeColorDefault", "WindowText");
+			BackColorDefault = GetConfigColor(ConfigPrefix + "BackColorDefault", "Window");
+			ForeColorDigit = GetConfigColor(ConfigPrefix + "ForeColorDigit", "Red");
+			BackColorDigit = GetConfigColor(ConfigPrefix + "BackColorDigit", "White");
+			ForeColorSpecial = GetConfigColor(ConfigPrefix + "ForeColorSpecial", "Green");
+			BackColorSpecial = GetConfigColor(ConfigPrefix + "BackColorSpecial", "White");
 			LowercaseDifferent = m_Config.GetBool(ConfigPrefix + "LowercaseDifferent", false);
-			help = m_Config.GetString(ConfigPrefix + "ForeColorLower", ColorToName(ForeColorDefault));
-			ForeColorLower = NameToColor(help);
-			help = m_Config.GetString(ConfigPrefix + "BackColorLower", ColorToName(BackColorDefault));
-			BackColorLower = NameToColor(help);
+			ForeColorLower = GetConfigColor(ConfigPrefix + "ForeColorLower", ColorToName(ForeColorDefault));
+			BackColorLower = GetConfigColor(ConfigPrefix + "BackColorLower", ColorToName(BackColorDefault));
 			SinglePwDisplayActive = m_Config.GetBool(ConfigPrefix + "SinglePwDisplay", SinglePwDisplayActive);
 			ColorPwGen = m_Config.GetBool(ConfigPrefix + "ColorPwGen", ColorPwGen);
 			Testmode = test;
