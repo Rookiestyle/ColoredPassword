@@ -208,7 +208,7 @@ namespace ColoredPassword
 
 		private void EnableProtectionInternal(bool bEnable)
 		{
-			if (!IsDisposed || Disposing) return;
+			if (IsDisposed || Disposing) return;
 			if (bEnable)
 			{
 				Visible = true;
