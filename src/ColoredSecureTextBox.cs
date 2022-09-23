@@ -178,13 +178,13 @@ namespace ColoredPassword
 			Parent.PerformLayout();
 		}
 
-		//Don't show ColorTextBox if
-		//  - m_form is set (KeyPromptForm or KeyCreationForm)
-		//  AND
-		//  - form.Shown event has not been raised yet
-		//
-		//This can result in a wrong CAPS LOCK warning tooltip - cf. https://github.com/Rookiestyle/ColoredPassword/issues/15
-		private bool m_bKeyFormShown = false;
+        //Don't show ColorTextBox if
+        //  - m_form is set (KeyPromptForm or KeyCreationForm)
+        //  AND
+        //  - form.Shown event has not been raised yet
+        //
+        //This can result in a wrong CAPS LOCK warning tooltip - cf. https://github.com/Rookiestyle/ColoredPassword/issues/15
+        private bool m_bKeyFormShown = false;
 		private bool? m_bRememberedProtectionState = null;
 		public override void EnableProtection(bool bEnable)
 		{
@@ -304,7 +304,7 @@ namespace ColoredPassword
 			}
 		}
 
-		private Form GetForm(Control c)
+		internal static Form GetForm(Control c)
 		{
 			if (c == null) return null;
 			var f = c.Parent;
@@ -383,11 +383,35 @@ namespace ColoredPassword
 			return lCR;
 		}
 
+		private bool? m_bIsPwEntryFormMultipleValues = null;
+		private bool IsPwEntryFormMultipleValues()
+		{
+			if (m_bIsPwEntryFormMultipleValues.HasValue) return m_bIsPwEntryFormMultipleValues.Value;
+			KeePass.Forms.PwEntryForm pef = ColoredSecureTextBox.GetForm(this) as KeePass.Forms.PwEntryForm;
+			if (pef == null)
+			{
+				m_bIsPwEntryFormMultipleValues = false;
+				return m_bIsPwEntryFormMultipleValues.Value;
+			}
+			m_bIsPwEntryFormMultipleValues = Tools.GetField("m_mvec", pef) != null;
+			if (m_bIsPwEntryFormMultipleValues.Value)
+				PluginDebug.AddInfo("PwEntryForm showing multiple entries: Do NOT color text (" + KeePass.Resources.KPRes.MultipleValues + ")", 0);
+			return m_bIsPwEntryFormMultipleValues.Value;
+		}
+
 		public void ColorText()
 		{
 			int nCursorPos = SelectionStart; //save cursor position
+			if (IsPwEntryFormMultipleValues() && this.Text == "(" + KeePass.Resources.KPRes.MultipleValues + ")")
+			{
+				//taken from KeePass.Util.MultipleValuesEx.ConfigureText
+				Color clrNormal = this.ForeColor;
+				Color clrMulti = UIUtil.ColorTowards(clrNormal, (UIUtil.IsDarkColor(
+				clrNormal) ? Color.White : Color.Black), 0.5);
+				this.ForeColor = clrMulti;
+				return;
+			}
 			SelectAll();
-
 			List<CharRange> lCR = GetRanges(this.Text);
 			List<string> lMsg = new List<string>();
 			bool bError = false;
