@@ -91,6 +91,26 @@ namespace ColoredPassword
 				e.DrawFocusRectangle();
 		}
 
+		private static bool m_bKeeThemeInstalled = true;
+		private void CleanupKeeTheme()
+		{
+			if (!m_bKeeThemeInstalled) return;
+			m_bKeeThemeInstalled = Tools.GetLoadedPluginsName().ContainsKey("KeeTheme.KeeThemeExt");
+			if (!m_bKeeThemeInstalled)
+			{
+				PluginDebug.AddInfo("Disable KeeTheme.ListView_DrawSubItem", 0, new string[]{"KeeTheme not found"});
+				return;
+			}
+			var lv = Tools.GetControl("m_lvEntries");
+			var ehAll = lv.GetEventHandlers("DrawSubItem");
+			var ehKeeTheme = ehAll.Find(x=>x.Target.GetType().FullName.Contains("KeeTheme"));
+			if (ehKeeTheme == null) return;
+			lv.RemoveEventHandlers("DrawSubItem", ehAll);
+			ehAll.Remove(ehKeeTheme);
+			lv.AddEventHandlers("DrawSubItem", ehAll);
+			PluginDebug.AddInfo("Disable KeeTheme.ListView_DrawSubItem", 0, new string[] { "Disabled" });
+		}
+
 		private void Lv_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
 		{
 			/* Do not handle first column
@@ -101,6 +121,8 @@ namespace ColoredPassword
 				e.DrawDefault = true;
 				return;
 			}
+
+			CleanupKeeTheme();
 
 			Color cItemForeground = e.Item.UseItemStyleForSubItems ? e.Item.ForeColor : e.SubItem.ForeColor;
 			Color cItemBackground = e.Item.UseItemStyleForSubItems ? e.Item.BackColor : e.SubItem.BackColor;
