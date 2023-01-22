@@ -37,6 +37,11 @@ namespace ColoredPassword
 	internal sealed class ColoredSecureTextBox : SecureTextBoxEx
 	{
 		private ColorTextBox m_text = null;
+		/// <summary>
+		/// Reference to the RIchTextBox used internally
+		/// Exposed as public to simpliy integration in other plugins
+		/// </summary>
+		public ColorTextBox ColoredTextBox { get { return m_text; } }
 
 		private bool m_bReadOnlySaved = false;
 		private bool m_bReadOnly = false;
