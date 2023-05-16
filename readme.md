@@ -63,4 +63,4 @@ If you're interested in any of the available translations in addition, please do
 In addition to the manual way of downloading the plugin, you can use [EarlyUpdateCheck](https://github.com/rookiestyle/earlyupdatecheck/) to update both the plugin and its translations automatically.  
 See the [one click plugin update wiki](https://github.com/Rookiestyle/EarlyUpdateCheck/wiki/One-click-plugin-update) for more details.
 # Requirements
-* KeePass: 2.40
+* KeePass: 2.46
