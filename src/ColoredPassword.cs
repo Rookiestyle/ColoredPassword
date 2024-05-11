@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using KeePass.App.Configuration;
 using KeePass.Plugins;
 using KeePass.UI;
+using KeePassLib;
 using KeePassLib.Utility;
 
 using PluginTools;
@@ -49,10 +50,76 @@ namespace ColoredPassword
 
       SinglePwDisplay.Enabled = ColorConfig.SinglePwDisplayActive;
 
+      m_host.MainWindow.UIStateUpdated += OnUIStateUpdated;
+
       return true;
     }
 
-    private void MainWindow_FormLoadPost(object sender, EventArgs e)
+    private void OnUIStateUpdated(object sender, EventArgs e)
+    {
+      if (!ColorConfig.DontShowAsteriskForEmptyFields) return;  
+      Dictionary<int, CP_ColumnType> dHiddenColumns = new Dictionary<int, CP_ColumnType>();
+      for (int i = 0; i < KeePass.Program.Config.MainWindow.EntryListColumns.Count; i++)
+      {
+        var col = KeePass.Program.Config.MainWindow.EntryListColumns[i];
+        if (!col.HideWithAsterisks) continue;
+        dHiddenColumns[i] = new CP_ColumnType(col);
+      }
+
+      if (dHiddenColumns.Count == 0) return;
+
+      ListView lv = (ListView)Tools.GetControl("m_lvEntries");
+      if (lv == null)
+      {
+        PluginDebug.AddError("Could not find m_lvEntries", 0);
+        return;
+      }
+
+      try
+      {
+        lv.BeginUpdate();
+
+        for (int i = lv.Items.Count - 1; i >= 0; i--)
+        {
+          ListViewItem lvi = null;
+          PwListItem li = null;
+          try
+          {
+            //This can throw if multiple concurrent changes are in progress
+            //Can happen when e. g. doing Edit Entries (quick) - Expire npw
+            lvi = lv.Items[i];
+            li = (lvi.Tag as PwListItem);
+          }
+          catch { }
+          if (li == null) continue;
+
+          if (li.Entry == null)
+          {
+            PluginDebug.AddError("List entry does not contain valid PwEntry", 0, lvi.Text);
+            continue; //should never happen but on the other side... you never know
+          }
+
+          foreach (var col in dHiddenColumns)
+          {
+            if (lvi.SubItems[col.Key].Text != PwDefs.HiddenPassword) continue;
+            if (col.Value.IsEmpty(li.Entry)) lvi.SubItems[col.Key].Text = string.Empty;
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        bool bDM = PluginDebug.DebugMode;
+        PluginDebug.DebugMode = true;
+        PluginDebug.AddError("Exception during OnUIStateUpdate", -1, ex.Message, ex.Source, ex.StackTrace);
+        PluginDebug.DebugMode = bDM;
+      }
+      finally
+      {
+        if (lv != null) lv.EndUpdate();
+      }
+  }
+
+  private void MainWindow_FormLoadPost(object sender, EventArgs e)
     {
       m_host.MainWindow.FormLoadPost -= MainWindow_FormLoadPost;
 
@@ -396,6 +463,7 @@ namespace ColoredPassword
       o.cbSyncColorsWithPrintForm.Checked = ColorConfig.SyncColorsWithPrintForm;
       o.cbSinglePwDisplay.Checked = ColorConfig.SinglePwDisplayActive;
       o.cbColorPwGen.Checked = ColorConfig.ColorPwGen;
+      o.cbDontShowAsterisk.Checked = ColorConfig.DontShowAsteriskForEmptyFields;
       o.ctbExample.ColorText();
       ColorConfig.Testmode = true;
     }
@@ -425,6 +493,7 @@ namespace ColoredPassword
       ColorConfig.SyncColorsWithPrintForm = o.cbSyncColorsWithPrintForm.Checked;
       SinglePwDisplay.Enabled = ColorConfig.SinglePwDisplayActive = o.cbSinglePwDisplay.Checked;
       ColorConfig.ColorPwGen = o.cbColorPwGen.Checked;
+      ColorConfig.DontShowAsteriskForEmptyFields = o.cbDontShowAsterisk.Checked;
       ColorConfig.Write();
       if (ColorConfig.Active) ColorPasswords(ColorConfig.Active);
     }

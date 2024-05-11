@@ -46,6 +46,8 @@ namespace ColoredPassword
 
       gSyncColorsWithPrintForm.Text = KeePass.Resources.KPRes.Print;
       cbSyncColorsWithPrintForm.Text = PluginTranslate.SyncColors;
+
+      cbDontShowAsterisk.Text = string.Format(PluginTranslate.DontShowAsterisks, KeePass.Resources.KPRes.HideUsingAsterisks);
     }
 
     private void OnColorSelect(object sender, EventArgs e)
@@ -80,7 +82,17 @@ namespace ColoredPassword
 
     private void cgActive_CheckedChanged(object sender, RookieUI.CheckedGroupCheckEventArgs e)
     {
-      foreach (Control c in tpAdvanced.Controls) c.Enabled = cgActive.Checked;
+      foreach (Control c in tpAdvanced.Controls)
+      {
+        if (c.Tag is string && ((string)c.Tag != "KEEPENABLED")) c.Enabled = cgActive.Checked;
+        else
+        {
+          foreach (Control c2 in c.Controls)
+          {
+            if (c2.Tag is string && ((string)c.Tag != "KEEPENABLED")) c2.Enabled = cgActive.Checked;
+          }
+        }
+      }
       if (PluginTools.Tools.KeePassVersion < ColorConfig.KP_2_51) gSyncColorsWithPrintForm.Enabled = false;
     }
   }

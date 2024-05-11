@@ -52,23 +52,24 @@
             this.bForeColorSpecial = new System.Windows.Forms.Button();
             this.bBackColorSpecial = new System.Windows.Forms.Button();
             this.tpAdvanced = new System.Windows.Forms.TabPage();
+            this.gSyncColorsWithPrintForm = new System.Windows.Forms.GroupBox();
+            this.cbSyncColorsWithPrintForm = new System.Windows.Forms.CheckBox();
             this.gPasswordGenerator = new System.Windows.Forms.GroupBox();
             this.cbColorPwGen = new System.Windows.Forms.CheckBox();
             this.gEntryView = new System.Windows.Forms.GroupBox();
+            this.cbDontShowAsterisk = new System.Windows.Forms.CheckBox();
             this.cbSinglePwDisplay = new System.Windows.Forms.CheckBox();
             this.cbColorEntryViewKeepBackgroundColor = new System.Windows.Forms.CheckBox();
             this.cbColorEntryView = new System.Windows.Forms.CheckBox();
-            this.gSyncColorsWithPrintForm = new System.Windows.Forms.GroupBox();
-            this.cbSyncColorsWithPrintForm = new System.Windows.Forms.CheckBox();
             this.gExample.SuspendLayout();
             this.pError.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpSettings.SuspendLayout();
             this.cgActive.SuspendLayout();
             this.tpAdvanced.SuspendLayout();
+            this.gSyncColorsWithPrintForm.SuspendLayout();
             this.gPasswordGenerator.SuspendLayout();
             this.gEntryView.SuspendLayout();
-            this.gSyncColorsWithPrintForm.SuspendLayout();
             this.SuspendLayout();
             // 
             // gExample
@@ -78,7 +79,7 @@
             this.gExample.AutoSize = true;
             this.gExample.Controls.Add(this.ctbExample);
             this.gExample.Location = new System.Drawing.Point(5, 315);
-            this.gExample.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.gExample.Margin = new System.Windows.Forms.Padding(5);
             this.gExample.Name = "gExample";
             this.gExample.Padding = new System.Windows.Forms.Padding(0);
             this.gExample.Size = new System.Drawing.Size(1428, 132);
@@ -106,7 +107,7 @@
             this.pError.Controls.Add(this.lError2);
             this.pError.Controls.Add(this.lError);
             this.pError.Location = new System.Drawing.Point(5, 428);
-            this.pError.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.pError.Margin = new System.Windows.Forms.Padding(5);
             this.pError.Name = "pError";
             this.pError.Padding = new System.Windows.Forms.Padding(18, 8, 18, 8);
             this.pError.Size = new System.Drawing.Size(1428, 95);
@@ -143,7 +144,7 @@
             this.tabControl1.Controls.Add(this.tpSettings);
             this.tabControl1.Controls.Add(this.tpAdvanced);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(5);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1452, 620);
@@ -155,9 +156,9 @@
             this.tpSettings.Controls.Add(this.gExample);
             this.tpSettings.Controls.Add(this.cgActive);
             this.tpSettings.Location = new System.Drawing.Point(10, 48);
-            this.tpSettings.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.tpSettings.Margin = new System.Windows.Forms.Padding(5);
             this.tpSettings.Name = "tpSettings";
-            this.tpSettings.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.tpSettings.Padding = new System.Windows.Forms.Padding(5);
             this.tpSettings.Size = new System.Drawing.Size(1432, 562);
             this.tpSettings.TabIndex = 0;
             this.tpSettings.Text = "Settings";
@@ -180,9 +181,9 @@
             this.cgActive.Controls.Add(this.bForeColorSpecial);
             this.cgActive.Controls.Add(this.bBackColorSpecial);
             this.cgActive.Location = new System.Drawing.Point(5, 5);
-            this.cgActive.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.cgActive.Margin = new System.Windows.Forms.Padding(5);
             this.cgActive.Name = "cgActive";
-            this.cgActive.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.cgActive.Padding = new System.Windows.Forms.Padding(5);
             this.cgActive.Size = new System.Drawing.Size(1428, 310);
             this.cgActive.TabIndex = 0;
             this.cgActive.Text = "cgActive";
@@ -202,7 +203,7 @@
             // 
             this.bForeColorDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bForeColorDefault.Location = new System.Drawing.Point(996, 34);
-            this.bForeColorDefault.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bForeColorDefault.Margin = new System.Windows.Forms.Padding(5);
             this.bForeColorDefault.Name = "bForeColorDefault";
             this.bForeColorDefault.Size = new System.Drawing.Size(68, 53);
             this.bForeColorDefault.TabIndex = 15;
@@ -214,7 +215,7 @@
             // 
             this.bBackColorDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bBackColorDefault.Location = new System.Drawing.Point(1259, 34);
-            this.bBackColorDefault.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bBackColorDefault.Margin = new System.Windows.Forms.Padding(5);
             this.bBackColorDefault.Name = "bBackColorDefault";
             this.bBackColorDefault.Size = new System.Drawing.Size(68, 53);
             this.bBackColorDefault.TabIndex = 17;
@@ -237,7 +238,7 @@
             // 
             this.bForeColorLower.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bForeColorLower.Location = new System.Drawing.Point(996, 96);
-            this.bForeColorLower.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bForeColorLower.Margin = new System.Windows.Forms.Padding(5);
             this.bForeColorLower.Name = "bForeColorLower";
             this.bForeColorLower.Size = new System.Drawing.Size(68, 53);
             this.bForeColorLower.TabIndex = 16;
@@ -249,7 +250,7 @@
             // 
             this.bBackColorLower.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bBackColorLower.Location = new System.Drawing.Point(1259, 96);
-            this.bBackColorLower.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bBackColorLower.Margin = new System.Windows.Forms.Padding(5);
             this.bBackColorLower.Name = "bBackColorLower";
             this.bBackColorLower.Size = new System.Drawing.Size(68, 53);
             this.bBackColorLower.TabIndex = 18;
@@ -271,7 +272,7 @@
             // 
             this.bForeColorDigit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bForeColorDigit.Location = new System.Drawing.Point(996, 158);
-            this.bForeColorDigit.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bForeColorDigit.Margin = new System.Windows.Forms.Padding(5);
             this.bForeColorDigit.Name = "bForeColorDigit";
             this.bForeColorDigit.Size = new System.Drawing.Size(68, 53);
             this.bForeColorDigit.TabIndex = 19;
@@ -283,7 +284,7 @@
             // 
             this.bBackColorDigit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bBackColorDigit.Location = new System.Drawing.Point(1259, 158);
-            this.bBackColorDigit.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bBackColorDigit.Margin = new System.Windows.Forms.Padding(5);
             this.bBackColorDigit.Name = "bBackColorDigit";
             this.bBackColorDigit.Size = new System.Drawing.Size(68, 53);
             this.bBackColorDigit.TabIndex = 20;
@@ -305,7 +306,7 @@
             // 
             this.bForeColorSpecial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bForeColorSpecial.Location = new System.Drawing.Point(996, 220);
-            this.bForeColorSpecial.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bForeColorSpecial.Margin = new System.Windows.Forms.Padding(5);
             this.bForeColorSpecial.Name = "bForeColorSpecial";
             this.bForeColorSpecial.Size = new System.Drawing.Size(68, 53);
             this.bForeColorSpecial.TabIndex = 21;
@@ -317,7 +318,7 @@
             // 
             this.bBackColorSpecial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bBackColorSpecial.Location = new System.Drawing.Point(1259, 220);
-            this.bBackColorSpecial.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.bBackColorSpecial.Margin = new System.Windows.Forms.Padding(5);
             this.bBackColorSpecial.Name = "bBackColorSpecial";
             this.bBackColorSpecial.Size = new System.Drawing.Size(68, 53);
             this.bBackColorSpecial.TabIndex = 22;
@@ -331,88 +332,18 @@
             this.tpAdvanced.Controls.Add(this.gPasswordGenerator);
             this.tpAdvanced.Controls.Add(this.gEntryView);
             this.tpAdvanced.Location = new System.Drawing.Point(10, 48);
-            this.tpAdvanced.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.tpAdvanced.Margin = new System.Windows.Forms.Padding(5);
             this.tpAdvanced.Name = "tpAdvanced";
-            this.tpAdvanced.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.tpAdvanced.Padding = new System.Windows.Forms.Padding(5);
             this.tpAdvanced.Size = new System.Drawing.Size(1432, 562);
             this.tpAdvanced.TabIndex = 1;
             this.tpAdvanced.Text = "Advanced";
             this.tpAdvanced.UseVisualStyleBackColor = true;
             // 
-            // gPasswordGenerator
-            // 
-            this.gPasswordGenerator.Controls.Add(this.cbColorPwGen);
-            this.gPasswordGenerator.Location = new System.Drawing.Point(5, 165);
-            this.gPasswordGenerator.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.gPasswordGenerator.Name = "gPasswordGenerator";
-            this.gPasswordGenerator.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.gPasswordGenerator.Size = new System.Drawing.Size(1428, 85);
-            this.gPasswordGenerator.TabIndex = 6;
-            this.gPasswordGenerator.TabStop = false;
-            this.gPasswordGenerator.Text = "Password Generator";
-            // 
-            // cbColorPwGen
-            // 
-            this.cbColorPwGen.AutoSize = true;
-            this.cbColorPwGen.Location = new System.Drawing.Point(18, 34);
-            this.cbColorPwGen.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.cbColorPwGen.Name = "cbColorPwGen";
-            this.cbColorPwGen.Size = new System.Drawing.Size(473, 36);
-            this.cbColorPwGen.TabIndex = 5;
-            this.cbColorPwGen.Text = "Use colors in password generator";
-            this.cbColorPwGen.UseVisualStyleBackColor = true;
-            // 
-            // gEntryView
-            // 
-            this.gEntryView.Controls.Add(this.cbSinglePwDisplay);
-            this.gEntryView.Controls.Add(this.cbColorEntryViewKeepBackgroundColor);
-            this.gEntryView.Controls.Add(this.cbColorEntryView);
-            this.gEntryView.Location = new System.Drawing.Point(5, 5);
-            this.gEntryView.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.gEntryView.Name = "gEntryView";
-            this.gEntryView.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.gEntryView.Size = new System.Drawing.Size(1428, 160);
-            this.gEntryView.TabIndex = 5;
-            this.gEntryView.TabStop = false;
-            this.gEntryView.Text = "Entry list";
-            // 
-            // cbSinglePwDisplay
-            // 
-            this.cbSinglePwDisplay.AutoSize = true;
-            this.cbSinglePwDisplay.Location = new System.Drawing.Point(18, 108);
-            this.cbSinglePwDisplay.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.cbSinglePwDisplay.Name = "cbSinglePwDisplay";
-            this.cbSinglePwDisplay.Size = new System.Drawing.Size(429, 36);
-            this.cbSinglePwDisplay.TabIndex = 6;
-            this.cbSinglePwDisplay.Text = "Single click password to show";
-            this.cbSinglePwDisplay.UseVisualStyleBackColor = true;
-            // 
-            // cbColorEntryViewKeepBackgroundColor
-            // 
-            this.cbColorEntryViewKeepBackgroundColor.AutoSize = true;
-            this.cbColorEntryViewKeepBackgroundColor.Location = new System.Drawing.Point(18, 71);
-            this.cbColorEntryViewKeepBackgroundColor.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.cbColorEntryViewKeepBackgroundColor.Name = "cbColorEntryViewKeepBackgroundColor";
-            this.cbColorEntryViewKeepBackgroundColor.Size = new System.Drawing.Size(479, 36);
-            this.cbColorEntryViewKeepBackgroundColor.TabIndex = 4;
-            this.cbColorEntryViewKeepBackgroundColor.Text = "Keep entry view background color";
-            this.cbColorEntryViewKeepBackgroundColor.UseVisualStyleBackColor = true;
-            // 
-            // cbColorEntryView
-            // 
-            this.cbColorEntryView.AutoSize = true;
-            this.cbColorEntryView.Location = new System.Drawing.Point(18, 34);
-            this.cbColorEntryView.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.cbColorEntryView.Name = "cbColorEntryView";
-            this.cbColorEntryView.Size = new System.Drawing.Size(255, 36);
-            this.cbColorEntryView.TabIndex = 5;
-            this.cbColorEntryView.Text = "Color entry view";
-            this.cbColorEntryView.UseVisualStyleBackColor = true;
-            // 
             // gSyncColorsWithPrintForm
             // 
             this.gSyncColorsWithPrintForm.Controls.Add(this.cbSyncColorsWithPrintForm);
-            this.gSyncColorsWithPrintForm.Location = new System.Drawing.Point(5, 250);
+            this.gSyncColorsWithPrintForm.Location = new System.Drawing.Point(5, 290);
             this.gSyncColorsWithPrintForm.Margin = new System.Windows.Forms.Padding(5);
             this.gSyncColorsWithPrintForm.Name = "gSyncColorsWithPrintForm";
             this.gSyncColorsWithPrintForm.Padding = new System.Windows.Forms.Padding(5);
@@ -432,13 +363,98 @@
             this.cbSyncColorsWithPrintForm.Text = "Sync with print form";
             this.cbSyncColorsWithPrintForm.UseVisualStyleBackColor = true;
             // 
+            // gPasswordGenerator
+            // 
+            this.gPasswordGenerator.Controls.Add(this.cbColorPwGen);
+            this.gPasswordGenerator.Location = new System.Drawing.Point(5, 205);
+            this.gPasswordGenerator.Margin = new System.Windows.Forms.Padding(5);
+            this.gPasswordGenerator.Name = "gPasswordGenerator";
+            this.gPasswordGenerator.Padding = new System.Windows.Forms.Padding(5);
+            this.gPasswordGenerator.Size = new System.Drawing.Size(1428, 85);
+            this.gPasswordGenerator.TabIndex = 6;
+            this.gPasswordGenerator.TabStop = false;
+            this.gPasswordGenerator.Text = "Password Generator";
+            // 
+            // cbColorPwGen
+            // 
+            this.cbColorPwGen.AutoSize = true;
+            this.cbColorPwGen.Location = new System.Drawing.Point(18, 34);
+            this.cbColorPwGen.Margin = new System.Windows.Forms.Padding(5);
+            this.cbColorPwGen.Name = "cbColorPwGen";
+            this.cbColorPwGen.Size = new System.Drawing.Size(473, 36);
+            this.cbColorPwGen.TabIndex = 5;
+            this.cbColorPwGen.Text = "Use colors in password generator";
+            this.cbColorPwGen.UseVisualStyleBackColor = true;
+            // 
+            // gEntryView
+            // 
+            this.gEntryView.Controls.Add(this.cbDontShowAsterisk);
+            this.gEntryView.Controls.Add(this.cbSinglePwDisplay);
+            this.gEntryView.Controls.Add(this.cbColorEntryViewKeepBackgroundColor);
+            this.gEntryView.Controls.Add(this.cbColorEntryView);
+            this.gEntryView.Location = new System.Drawing.Point(5, 5);
+            this.gEntryView.Margin = new System.Windows.Forms.Padding(5);
+            this.gEntryView.Name = "gEntryView";
+            this.gEntryView.Padding = new System.Windows.Forms.Padding(5);
+            this.gEntryView.Size = new System.Drawing.Size(1428, 200);
+            this.gEntryView.TabIndex = 5;
+            this.gEntryView.TabStop = false;
+            this.gEntryView.Tag = "KEEPENABLED";
+            this.gEntryView.Text = "Entry list";
+            // 
+            // cbDontShowAsterisk
+            // 
+            this.cbDontShowAsterisk.AutoSize = true;
+            this.cbDontShowAsterisk.Location = new System.Drawing.Point(18, 142);
+            this.cbDontShowAsterisk.Margin = new System.Windows.Forms.Padding(5);
+            this.cbDontShowAsterisk.Name = "cbDontShowAsterisk";
+            this.cbDontShowAsterisk.Size = new System.Drawing.Size(509, 36);
+            this.cbDontShowAsterisk.TabIndex = 7;
+            this.cbDontShowAsterisk.Tag = "KEEPENABLED";
+            this.cbDontShowAsterisk.Text = "Don\'t show asterisks for empty fields";
+            this.cbDontShowAsterisk.UseVisualStyleBackColor = true;
+            // 
+            // cbSinglePwDisplay
+            // 
+            this.cbSinglePwDisplay.AutoSize = true;
+            this.cbSinglePwDisplay.Location = new System.Drawing.Point(18, 108);
+            this.cbSinglePwDisplay.Margin = new System.Windows.Forms.Padding(5);
+            this.cbSinglePwDisplay.Name = "cbSinglePwDisplay";
+            this.cbSinglePwDisplay.Size = new System.Drawing.Size(429, 36);
+            this.cbSinglePwDisplay.TabIndex = 6;
+            this.cbSinglePwDisplay.Tag = "KEEPENABLED";
+            this.cbSinglePwDisplay.Text = "Single click password to show";
+            this.cbSinglePwDisplay.UseVisualStyleBackColor = true;
+            // 
+            // cbColorEntryViewKeepBackgroundColor
+            // 
+            this.cbColorEntryViewKeepBackgroundColor.AutoSize = true;
+            this.cbColorEntryViewKeepBackgroundColor.Location = new System.Drawing.Point(18, 71);
+            this.cbColorEntryViewKeepBackgroundColor.Margin = new System.Windows.Forms.Padding(5);
+            this.cbColorEntryViewKeepBackgroundColor.Name = "cbColorEntryViewKeepBackgroundColor";
+            this.cbColorEntryViewKeepBackgroundColor.Size = new System.Drawing.Size(479, 36);
+            this.cbColorEntryViewKeepBackgroundColor.TabIndex = 4;
+            this.cbColorEntryViewKeepBackgroundColor.Text = "Keep entry view background color";
+            this.cbColorEntryViewKeepBackgroundColor.UseVisualStyleBackColor = true;
+            // 
+            // cbColorEntryView
+            // 
+            this.cbColorEntryView.AutoSize = true;
+            this.cbColorEntryView.Location = new System.Drawing.Point(18, 34);
+            this.cbColorEntryView.Margin = new System.Windows.Forms.Padding(5);
+            this.cbColorEntryView.Name = "cbColorEntryView";
+            this.cbColorEntryView.Size = new System.Drawing.Size(255, 36);
+            this.cbColorEntryView.TabIndex = 5;
+            this.cbColorEntryView.Text = "Color entry view";
+            this.cbColorEntryView.UseVisualStyleBackColor = true;
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.Controls.Add(this.tabControl1);
-            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "Options";
             this.Size = new System.Drawing.Size(1452, 693);
             this.Resize += new System.EventHandler(this.Options_Resize);
@@ -451,12 +467,12 @@
             this.cgActive.ResumeLayout(false);
             this.cgActive.PerformLayout();
             this.tpAdvanced.ResumeLayout(false);
+            this.gSyncColorsWithPrintForm.ResumeLayout(false);
+            this.gSyncColorsWithPrintForm.PerformLayout();
             this.gPasswordGenerator.ResumeLayout(false);
             this.gPasswordGenerator.PerformLayout();
             this.gEntryView.ResumeLayout(false);
             this.gEntryView.PerformLayout();
-            this.gSyncColorsWithPrintForm.ResumeLayout(false);
-            this.gSyncColorsWithPrintForm.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -493,5 +509,6 @@
 		internal System.Windows.Forms.Button bBackColorSpecial;
         private System.Windows.Forms.GroupBox gSyncColorsWithPrintForm;
         internal System.Windows.Forms.CheckBox cbSyncColorsWithPrintForm;
-    }
+    internal System.Windows.Forms.CheckBox cbDontShowAsterisk;
+  }
 }

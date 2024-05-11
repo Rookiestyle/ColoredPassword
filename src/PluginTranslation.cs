@@ -75,6 +75,10 @@ namespace PluginTranslation
     /// Snychronize font colors
     /// </summary>
     public static readonly string SyncColors = @"Snychronize font colors";
+    /// <summary>
+    /// Don't show asterisks for empty fields if '{0}' is active
+    /// </summary>
+    public static readonly string DontShowAsterisks = @"Don't show asterisks for empty fields if '{0}' is active";
     #endregion
 
     #region NO changes in this area

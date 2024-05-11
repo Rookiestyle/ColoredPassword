@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using KeePass.App.Configuration;
 using KeePass.Plugins;
+using KeePassLib;
 
 namespace ColoredPassword
 {
@@ -24,6 +25,13 @@ namespace ColoredPassword
       get { return m_Config.GetBool("ColoredPassword.SyncColorsWithPrintForm", true); }
       set { m_Config.SetBool("ColoredPassword.SyncColorsWithPrintForm", value); }
     }
+
+    public static bool DontShowAsteriskForEmptyFields
+    {
+      get { return m_Config.GetBool("ColoredPassword.DontShowAsteriskForEmptyFields", false); }
+      set { m_Config.SetBool("ColoredPassword.DontShowAsteriskForEmptyFields", value); }
+    }
+
     public static bool Testmode
     {
       get { return m_Testmode; }
@@ -274,4 +282,43 @@ namespace ColoredPassword
       return l < 0.5 ? Color.White : Color.Black;
     }
   }
+
+  class CP_ColumnType
+  {
+    private AceColumn m_ace = null;
+
+    private string m_sField = null;
+
+    public CP_ColumnType(AceColumn ace)
+    {
+      m_ace = ace;
+      if (m_ace == null) return;
+      switch (ace.Type)
+      {
+        case AceColumnType.Title: m_sField = PwDefs.TitleField; break;
+        case AceColumnType.UserName: m_sField = PwDefs.UserNameField; break;
+        case AceColumnType.Password: m_sField = PwDefs.PasswordField; break;
+        case AceColumnType.Url: m_sField = PwDefs.UrlField; break;
+        case AceColumnType.Notes: m_sField = PwDefs.NotesField; break;
+        case AceColumnType.CustomString: m_sField = m_ace.CustomName; break;
+        case AceColumnType.PluginExt: m_sField = m_ace.CustomName; break;
+      }
+      if (!string.IsNullOrEmpty(m_sField)) return;
+      
+      PluginTools.PluginDebug.AddWarning("Unsupported column for asterisk check: " + m_ace.Type.ToString() + 
+          (string.IsNullOrEmpty(m_ace.CustomName) ? string.Empty : " - " + m_ace.CustomName), 0);
+    }
+    public bool IsEmpty(PwEntry pe)
+    {
+      if (m_ace == null) return false;
+
+      if (m_sField == null) return false;
+      if (pe == null) return false;
+
+      if (m_ace.Type != AceColumnType.PluginExt) return pe.Strings.GetSafe(m_sField).IsEmpty;
+
+      return string.IsNullOrEmpty(KeePass.Program.ColumnProviderPool.GetCellData(m_sField, pe));
+    }
+  }
+
 }
