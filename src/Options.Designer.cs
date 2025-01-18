@@ -61,6 +61,7 @@
             this.cbSinglePwDisplay = new System.Windows.Forms.CheckBox();
             this.cbColorEntryViewKeepBackgroundColor = new System.Windows.Forms.CheckBox();
             this.cbColorEntryView = new System.Windows.Forms.CheckBox();
+            this.bReset = new System.Windows.Forms.Button();
             this.gExample.SuspendLayout();
             this.pError.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -77,12 +78,13 @@
             this.gExample.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gExample.AutoSize = true;
+            this.gExample.Controls.Add(this.bReset);
             this.gExample.Controls.Add(this.ctbExample);
-            this.gExample.Location = new System.Drawing.Point(5, 315);
-            this.gExample.Margin = new System.Windows.Forms.Padding(5);
+            this.gExample.Location = new System.Drawing.Point(2, 163);
+            this.gExample.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gExample.Name = "gExample";
             this.gExample.Padding = new System.Windows.Forms.Padding(0);
-            this.gExample.Size = new System.Drawing.Size(1428, 132);
+            this.gExample.Size = new System.Drawing.Size(714, 68);
             this.gExample.TabIndex = 4;
             this.gExample.TabStop = false;
             this.gExample.Text = "gExample";
@@ -90,11 +92,11 @@
             // ctbExample
             // 
             this.ctbExample.ColorBackground = true;
-            this.ctbExample.Location = new System.Drawing.Point(18, 43);
+            this.ctbExample.Location = new System.Drawing.Point(9, 22);
             this.ctbExample.Margin = new System.Windows.Forms.Padding(0);
             this.ctbExample.Multiline = false;
             this.ctbExample.Name = "ctbExample";
-            this.ctbExample.Size = new System.Drawing.Size(530, 38);
+            this.ctbExample.Size = new System.Drawing.Size(267, 22);
             this.ctbExample.TabIndex = 1;
             this.ctbExample.Text = "ABC123!\"@abc";
             // 
@@ -106,11 +108,11 @@
             this.pError.BackColor = System.Drawing.Color.Transparent;
             this.pError.Controls.Add(this.lError2);
             this.pError.Controls.Add(this.lError);
-            this.pError.Location = new System.Drawing.Point(5, 428);
-            this.pError.Margin = new System.Windows.Forms.Padding(5);
+            this.pError.Location = new System.Drawing.Point(2, 221);
+            this.pError.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.pError.Name = "pError";
-            this.pError.Padding = new System.Windows.Forms.Padding(18, 8, 18, 8);
-            this.pError.Size = new System.Drawing.Size(1428, 95);
+            this.pError.Padding = new System.Windows.Forms.Padding(9, 4, 9, 4);
+            this.pError.Size = new System.Drawing.Size(714, 49);
             this.pError.TabIndex = 5;
             // 
             // lError2
@@ -119,10 +121,10 @@
             this.lError2.AutoSize = true;
             this.lError2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lError2.ForeColor = System.Drawing.Color.Red;
-            this.lError2.Location = new System.Drawing.Point(18, 39);
-            this.lError2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lError2.Location = new System.Drawing.Point(9, 20);
+            this.lError2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lError2.Name = "lError2";
-            this.lError2.Size = new System.Drawing.Size(95, 31);
+            this.lError2.Size = new System.Drawing.Size(54, 17);
             this.lError2.TabIndex = 9;
             this.lError2.Text = "Error2";
             // 
@@ -132,10 +134,10 @@
             this.lError.AutoSize = true;
             this.lError.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lError.ForeColor = System.Drawing.Color.Red;
-            this.lError.Location = new System.Drawing.Point(18, 8);
-            this.lError.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lError.Location = new System.Drawing.Point(9, 4);
+            this.lError.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lError.Name = "lError";
-            this.lError.Size = new System.Drawing.Size(79, 31);
+            this.lError.Size = new System.Drawing.Size(45, 17);
             this.lError.TabIndex = 8;
             this.lError.Text = "Error";
             // 
@@ -144,10 +146,10 @@
             this.tabControl1.Controls.Add(this.tpSettings);
             this.tabControl1.Controls.Add(this.tpAdvanced);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(5);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1452, 620);
+            this.tabControl1.Size = new System.Drawing.Size(726, 320);
             this.tabControl1.TabIndex = 6;
             // 
             // tpSettings
@@ -155,11 +157,11 @@
             this.tpSettings.Controls.Add(this.pError);
             this.tpSettings.Controls.Add(this.gExample);
             this.tpSettings.Controls.Add(this.cgActive);
-            this.tpSettings.Location = new System.Drawing.Point(10, 48);
-            this.tpSettings.Margin = new System.Windows.Forms.Padding(5);
+            this.tpSettings.Location = new System.Drawing.Point(4, 25);
+            this.tpSettings.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tpSettings.Name = "tpSettings";
-            this.tpSettings.Padding = new System.Windows.Forms.Padding(5);
-            this.tpSettings.Size = new System.Drawing.Size(1432, 562);
+            this.tpSettings.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.tpSettings.Size = new System.Drawing.Size(718, 291);
             this.tpSettings.TabIndex = 0;
             this.tpSettings.Text = "Settings";
             this.tpSettings.UseVisualStyleBackColor = true;
@@ -180,11 +182,11 @@
             this.cgActive.Controls.Add(this.lSpecial);
             this.cgActive.Controls.Add(this.bForeColorSpecial);
             this.cgActive.Controls.Add(this.bBackColorSpecial);
-            this.cgActive.Location = new System.Drawing.Point(5, 5);
-            this.cgActive.Margin = new System.Windows.Forms.Padding(5);
+            this.cgActive.Location = new System.Drawing.Point(2, 3);
+            this.cgActive.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cgActive.Name = "cgActive";
-            this.cgActive.Padding = new System.Windows.Forms.Padding(5);
-            this.cgActive.Size = new System.Drawing.Size(1428, 310);
+            this.cgActive.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.cgActive.Size = new System.Drawing.Size(714, 160);
             this.cgActive.TabIndex = 0;
             this.cgActive.Text = "cgActive";
             this.cgActive.CheckedChanged += new System.EventHandler<RookieUI.CheckedGroupCheckEventArgs>(this.cgActive_CheckedChanged);
@@ -192,20 +194,20 @@
             // lDefault
             // 
             this.lDefault.AutoSize = true;
-            this.lDefault.Location = new System.Drawing.Point(18, 45);
-            this.lDefault.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lDefault.Location = new System.Drawing.Point(9, 23);
+            this.lDefault.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lDefault.Name = "lDefault";
-            this.lDefault.Size = new System.Drawing.Size(106, 32);
+            this.lDefault.Size = new System.Drawing.Size(49, 16);
             this.lDefault.TabIndex = 23;
             this.lDefault.Text = "Default";
             // 
             // bForeColorDefault
             // 
             this.bForeColorDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bForeColorDefault.Location = new System.Drawing.Point(996, 34);
-            this.bForeColorDefault.Margin = new System.Windows.Forms.Padding(5);
+            this.bForeColorDefault.Location = new System.Drawing.Point(498, 18);
+            this.bForeColorDefault.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bForeColorDefault.Name = "bForeColorDefault";
-            this.bForeColorDefault.Size = new System.Drawing.Size(68, 53);
+            this.bForeColorDefault.Size = new System.Drawing.Size(34, 27);
             this.bForeColorDefault.TabIndex = 15;
             this.bForeColorDefault.Text = "button1";
             this.bForeColorDefault.UseVisualStyleBackColor = true;
@@ -214,10 +216,10 @@
             // bBackColorDefault
             // 
             this.bBackColorDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bBackColorDefault.Location = new System.Drawing.Point(1259, 34);
-            this.bBackColorDefault.Margin = new System.Windows.Forms.Padding(5);
+            this.bBackColorDefault.Location = new System.Drawing.Point(630, 18);
+            this.bBackColorDefault.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bBackColorDefault.Name = "bBackColorDefault";
-            this.bBackColorDefault.Size = new System.Drawing.Size(68, 53);
+            this.bBackColorDefault.Size = new System.Drawing.Size(34, 27);
             this.bBackColorDefault.TabIndex = 17;
             this.bBackColorDefault.Text = "button2";
             this.bBackColorDefault.UseVisualStyleBackColor = true;
@@ -226,10 +228,10 @@
             // cbLowercase
             // 
             this.cbLowercase.AutoSize = true;
-            this.cbLowercase.Location = new System.Drawing.Point(66, 104);
-            this.cbLowercase.Margin = new System.Windows.Forms.Padding(53, 5, 5, 5);
+            this.cbLowercase.Location = new System.Drawing.Point(33, 54);
+            this.cbLowercase.Margin = new System.Windows.Forms.Padding(26, 3, 2, 3);
             this.cbLowercase.Name = "cbLowercase";
-            this.cbLowercase.Size = new System.Drawing.Size(190, 36);
+            this.cbLowercase.Size = new System.Drawing.Size(95, 20);
             this.cbLowercase.TabIndex = 24;
             this.cbLowercase.Text = "Lowercase";
             this.cbLowercase.CheckedChanged += new System.EventHandler(this.cbLowercase_CheckedChanged);
@@ -237,10 +239,10 @@
             // bForeColorLower
             // 
             this.bForeColorLower.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bForeColorLower.Location = new System.Drawing.Point(996, 96);
-            this.bForeColorLower.Margin = new System.Windows.Forms.Padding(5);
+            this.bForeColorLower.Location = new System.Drawing.Point(498, 50);
+            this.bForeColorLower.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bForeColorLower.Name = "bForeColorLower";
-            this.bForeColorLower.Size = new System.Drawing.Size(68, 53);
+            this.bForeColorLower.Size = new System.Drawing.Size(34, 27);
             this.bForeColorLower.TabIndex = 16;
             this.bForeColorLower.Text = "button1";
             this.bForeColorLower.UseVisualStyleBackColor = true;
@@ -249,10 +251,10 @@
             // bBackColorLower
             // 
             this.bBackColorLower.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bBackColorLower.Location = new System.Drawing.Point(1259, 96);
-            this.bBackColorLower.Margin = new System.Windows.Forms.Padding(5);
+            this.bBackColorLower.Location = new System.Drawing.Point(630, 50);
+            this.bBackColorLower.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bBackColorLower.Name = "bBackColorLower";
-            this.bBackColorLower.Size = new System.Drawing.Size(68, 53);
+            this.bBackColorLower.Size = new System.Drawing.Size(34, 27);
             this.bBackColorLower.TabIndex = 18;
             this.bBackColorLower.Text = "button2";
             this.bBackColorLower.UseVisualStyleBackColor = true;
@@ -261,20 +263,20 @@
             // lDigits
             // 
             this.lDigits.AutoSize = true;
-            this.lDigits.Location = new System.Drawing.Point(18, 169);
-            this.lDigits.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lDigits.Location = new System.Drawing.Point(9, 87);
+            this.lDigits.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lDigits.Name = "lDigits";
-            this.lDigits.Size = new System.Drawing.Size(87, 32);
+            this.lDigits.Size = new System.Drawing.Size(41, 16);
             this.lDigits.TabIndex = 13;
             this.lDigits.Text = "Digits";
             // 
             // bForeColorDigit
             // 
             this.bForeColorDigit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bForeColorDigit.Location = new System.Drawing.Point(996, 158);
-            this.bForeColorDigit.Margin = new System.Windows.Forms.Padding(5);
+            this.bForeColorDigit.Location = new System.Drawing.Point(498, 82);
+            this.bForeColorDigit.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bForeColorDigit.Name = "bForeColorDigit";
-            this.bForeColorDigit.Size = new System.Drawing.Size(68, 53);
+            this.bForeColorDigit.Size = new System.Drawing.Size(34, 27);
             this.bForeColorDigit.TabIndex = 19;
             this.bForeColorDigit.Text = "button1";
             this.bForeColorDigit.UseVisualStyleBackColor = true;
@@ -283,10 +285,10 @@
             // bBackColorDigit
             // 
             this.bBackColorDigit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bBackColorDigit.Location = new System.Drawing.Point(1259, 158);
-            this.bBackColorDigit.Margin = new System.Windows.Forms.Padding(5);
+            this.bBackColorDigit.Location = new System.Drawing.Point(630, 82);
+            this.bBackColorDigit.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bBackColorDigit.Name = "bBackColorDigit";
-            this.bBackColorDigit.Size = new System.Drawing.Size(68, 53);
+            this.bBackColorDigit.Size = new System.Drawing.Size(34, 27);
             this.bBackColorDigit.TabIndex = 20;
             this.bBackColorDigit.Text = "button2";
             this.bBackColorDigit.UseVisualStyleBackColor = true;
@@ -295,20 +297,20 @@
             // lSpecial
             // 
             this.lSpecial.AutoSize = true;
-            this.lSpecial.Location = new System.Drawing.Point(18, 231);
-            this.lSpecial.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.lSpecial.Location = new System.Drawing.Point(9, 119);
+            this.lSpecial.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lSpecial.Name = "lSpecial";
-            this.lSpecial.Size = new System.Drawing.Size(110, 32);
+            this.lSpecial.Size = new System.Drawing.Size(53, 16);
             this.lSpecial.TabIndex = 14;
             this.lSpecial.Text = "Special";
             // 
             // bForeColorSpecial
             // 
             this.bForeColorSpecial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bForeColorSpecial.Location = new System.Drawing.Point(996, 220);
-            this.bForeColorSpecial.Margin = new System.Windows.Forms.Padding(5);
+            this.bForeColorSpecial.Location = new System.Drawing.Point(498, 114);
+            this.bForeColorSpecial.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bForeColorSpecial.Name = "bForeColorSpecial";
-            this.bForeColorSpecial.Size = new System.Drawing.Size(68, 53);
+            this.bForeColorSpecial.Size = new System.Drawing.Size(34, 27);
             this.bForeColorSpecial.TabIndex = 21;
             this.bForeColorSpecial.Text = "button3";
             this.bForeColorSpecial.UseVisualStyleBackColor = true;
@@ -317,10 +319,10 @@
             // bBackColorSpecial
             // 
             this.bBackColorSpecial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bBackColorSpecial.Location = new System.Drawing.Point(1259, 220);
-            this.bBackColorSpecial.Margin = new System.Windows.Forms.Padding(5);
+            this.bBackColorSpecial.Location = new System.Drawing.Point(630, 114);
+            this.bBackColorSpecial.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.bBackColorSpecial.Name = "bBackColorSpecial";
-            this.bBackColorSpecial.Size = new System.Drawing.Size(68, 53);
+            this.bBackColorSpecial.Size = new System.Drawing.Size(34, 27);
             this.bBackColorSpecial.TabIndex = 22;
             this.bBackColorSpecial.Text = "button4";
             this.bBackColorSpecial.UseVisualStyleBackColor = true;
@@ -331,11 +333,11 @@
             this.tpAdvanced.Controls.Add(this.gSyncColorsWithPrintForm);
             this.tpAdvanced.Controls.Add(this.gPasswordGenerator);
             this.tpAdvanced.Controls.Add(this.gEntryView);
-            this.tpAdvanced.Location = new System.Drawing.Point(10, 48);
-            this.tpAdvanced.Margin = new System.Windows.Forms.Padding(5);
+            this.tpAdvanced.Location = new System.Drawing.Point(4, 25);
+            this.tpAdvanced.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tpAdvanced.Name = "tpAdvanced";
-            this.tpAdvanced.Padding = new System.Windows.Forms.Padding(5);
-            this.tpAdvanced.Size = new System.Drawing.Size(1432, 562);
+            this.tpAdvanced.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.tpAdvanced.Size = new System.Drawing.Size(718, 291);
             this.tpAdvanced.TabIndex = 1;
             this.tpAdvanced.Text = "Advanced";
             this.tpAdvanced.UseVisualStyleBackColor = true;
@@ -343,11 +345,11 @@
             // gSyncColorsWithPrintForm
             // 
             this.gSyncColorsWithPrintForm.Controls.Add(this.cbSyncColorsWithPrintForm);
-            this.gSyncColorsWithPrintForm.Location = new System.Drawing.Point(5, 290);
-            this.gSyncColorsWithPrintForm.Margin = new System.Windows.Forms.Padding(5);
+            this.gSyncColorsWithPrintForm.Location = new System.Drawing.Point(2, 150);
+            this.gSyncColorsWithPrintForm.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gSyncColorsWithPrintForm.Name = "gSyncColorsWithPrintForm";
-            this.gSyncColorsWithPrintForm.Padding = new System.Windows.Forms.Padding(5);
-            this.gSyncColorsWithPrintForm.Size = new System.Drawing.Size(1428, 85);
+            this.gSyncColorsWithPrintForm.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gSyncColorsWithPrintForm.Size = new System.Drawing.Size(714, 44);
             this.gSyncColorsWithPrintForm.TabIndex = 7;
             this.gSyncColorsWithPrintForm.TabStop = false;
             this.gSyncColorsWithPrintForm.Text = "Sync with print form";
@@ -355,10 +357,10 @@
             // cbSyncColorsWithPrintForm
             // 
             this.cbSyncColorsWithPrintForm.AutoSize = true;
-            this.cbSyncColorsWithPrintForm.Location = new System.Drawing.Point(18, 34);
-            this.cbSyncColorsWithPrintForm.Margin = new System.Windows.Forms.Padding(5);
+            this.cbSyncColorsWithPrintForm.Location = new System.Drawing.Point(9, 18);
+            this.cbSyncColorsWithPrintForm.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cbSyncColorsWithPrintForm.Name = "cbSyncColorsWithPrintForm";
-            this.cbSyncColorsWithPrintForm.Size = new System.Drawing.Size(300, 36);
+            this.cbSyncColorsWithPrintForm.Size = new System.Drawing.Size(141, 20);
             this.cbSyncColorsWithPrintForm.TabIndex = 5;
             this.cbSyncColorsWithPrintForm.Text = "Sync with print form";
             this.cbSyncColorsWithPrintForm.UseVisualStyleBackColor = true;
@@ -366,11 +368,11 @@
             // gPasswordGenerator
             // 
             this.gPasswordGenerator.Controls.Add(this.cbColorPwGen);
-            this.gPasswordGenerator.Location = new System.Drawing.Point(5, 205);
-            this.gPasswordGenerator.Margin = new System.Windows.Forms.Padding(5);
+            this.gPasswordGenerator.Location = new System.Drawing.Point(2, 106);
+            this.gPasswordGenerator.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gPasswordGenerator.Name = "gPasswordGenerator";
-            this.gPasswordGenerator.Padding = new System.Windows.Forms.Padding(5);
-            this.gPasswordGenerator.Size = new System.Drawing.Size(1428, 85);
+            this.gPasswordGenerator.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gPasswordGenerator.Size = new System.Drawing.Size(714, 44);
             this.gPasswordGenerator.TabIndex = 6;
             this.gPasswordGenerator.TabStop = false;
             this.gPasswordGenerator.Text = "Password Generator";
@@ -378,10 +380,10 @@
             // cbColorPwGen
             // 
             this.cbColorPwGen.AutoSize = true;
-            this.cbColorPwGen.Location = new System.Drawing.Point(18, 34);
-            this.cbColorPwGen.Margin = new System.Windows.Forms.Padding(5);
+            this.cbColorPwGen.Location = new System.Drawing.Point(9, 18);
+            this.cbColorPwGen.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cbColorPwGen.Name = "cbColorPwGen";
-            this.cbColorPwGen.Size = new System.Drawing.Size(473, 36);
+            this.cbColorPwGen.Size = new System.Drawing.Size(230, 20);
             this.cbColorPwGen.TabIndex = 5;
             this.cbColorPwGen.Text = "Use colors in password generator";
             this.cbColorPwGen.UseVisualStyleBackColor = true;
@@ -392,11 +394,11 @@
             this.gEntryView.Controls.Add(this.cbSinglePwDisplay);
             this.gEntryView.Controls.Add(this.cbColorEntryViewKeepBackgroundColor);
             this.gEntryView.Controls.Add(this.cbColorEntryView);
-            this.gEntryView.Location = new System.Drawing.Point(5, 5);
-            this.gEntryView.Margin = new System.Windows.Forms.Padding(5);
+            this.gEntryView.Location = new System.Drawing.Point(2, 3);
+            this.gEntryView.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gEntryView.Name = "gEntryView";
-            this.gEntryView.Padding = new System.Windows.Forms.Padding(5);
-            this.gEntryView.Size = new System.Drawing.Size(1428, 200);
+            this.gEntryView.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gEntryView.Size = new System.Drawing.Size(714, 103);
             this.gEntryView.TabIndex = 5;
             this.gEntryView.TabStop = false;
             this.gEntryView.Tag = "KEEPENABLED";
@@ -405,10 +407,10 @@
             // cbDontShowAsterisk
             // 
             this.cbDontShowAsterisk.AutoSize = true;
-            this.cbDontShowAsterisk.Location = new System.Drawing.Point(18, 142);
-            this.cbDontShowAsterisk.Margin = new System.Windows.Forms.Padding(5);
+            this.cbDontShowAsterisk.Location = new System.Drawing.Point(9, 73);
+            this.cbDontShowAsterisk.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cbDontShowAsterisk.Name = "cbDontShowAsterisk";
-            this.cbDontShowAsterisk.Size = new System.Drawing.Size(509, 36);
+            this.cbDontShowAsterisk.Size = new System.Drawing.Size(244, 20);
             this.cbDontShowAsterisk.TabIndex = 7;
             this.cbDontShowAsterisk.Tag = "KEEPENABLED";
             this.cbDontShowAsterisk.Text = "Don\'t show asterisks for empty fields";
@@ -417,10 +419,10 @@
             // cbSinglePwDisplay
             // 
             this.cbSinglePwDisplay.AutoSize = true;
-            this.cbSinglePwDisplay.Location = new System.Drawing.Point(18, 108);
-            this.cbSinglePwDisplay.Margin = new System.Windows.Forms.Padding(5);
+            this.cbSinglePwDisplay.Location = new System.Drawing.Point(9, 56);
+            this.cbSinglePwDisplay.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cbSinglePwDisplay.Name = "cbSinglePwDisplay";
-            this.cbSinglePwDisplay.Size = new System.Drawing.Size(429, 36);
+            this.cbSinglePwDisplay.Size = new System.Drawing.Size(207, 20);
             this.cbSinglePwDisplay.TabIndex = 6;
             this.cbSinglePwDisplay.Tag = "KEEPENABLED";
             this.cbSinglePwDisplay.Text = "Single click password to show";
@@ -429,10 +431,10 @@
             // cbColorEntryViewKeepBackgroundColor
             // 
             this.cbColorEntryViewKeepBackgroundColor.AutoSize = true;
-            this.cbColorEntryViewKeepBackgroundColor.Location = new System.Drawing.Point(18, 71);
-            this.cbColorEntryViewKeepBackgroundColor.Margin = new System.Windows.Forms.Padding(5);
+            this.cbColorEntryViewKeepBackgroundColor.Location = new System.Drawing.Point(9, 37);
+            this.cbColorEntryViewKeepBackgroundColor.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cbColorEntryViewKeepBackgroundColor.Name = "cbColorEntryViewKeepBackgroundColor";
-            this.cbColorEntryViewKeepBackgroundColor.Size = new System.Drawing.Size(479, 36);
+            this.cbColorEntryViewKeepBackgroundColor.Size = new System.Drawing.Size(231, 20);
             this.cbColorEntryViewKeepBackgroundColor.TabIndex = 4;
             this.cbColorEntryViewKeepBackgroundColor.Text = "Keep entry view background color";
             this.cbColorEntryViewKeepBackgroundColor.UseVisualStyleBackColor = true;
@@ -440,23 +442,33 @@
             // cbColorEntryView
             // 
             this.cbColorEntryView.AutoSize = true;
-            this.cbColorEntryView.Location = new System.Drawing.Point(18, 34);
-            this.cbColorEntryView.Margin = new System.Windows.Forms.Padding(5);
+            this.cbColorEntryView.Location = new System.Drawing.Point(9, 18);
+            this.cbColorEntryView.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cbColorEntryView.Name = "cbColorEntryView";
-            this.cbColorEntryView.Size = new System.Drawing.Size(255, 36);
+            this.cbColorEntryView.Size = new System.Drawing.Size(123, 20);
             this.cbColorEntryView.TabIndex = 5;
             this.cbColorEntryView.Text = "Color entry view";
             this.cbColorEntryView.UseVisualStyleBackColor = true;
             // 
+            // bReset
+            // 
+            this.bReset.Location = new System.Drawing.Point(498, 22);
+            this.bReset.Name = "bReset";
+            this.bReset.Size = new System.Drawing.Size(166, 23);
+            this.bReset.TabIndex = 2;
+            this.bReset.Text = "Reset";
+            this.bReset.UseVisualStyleBackColor = true;
+            this.bReset.Click += new System.EventHandler(this.bReset_Click);
+            // 
             // Options
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.Controls.Add(this.tabControl1);
-            this.Margin = new System.Windows.Forms.Padding(5);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "Options";
-            this.Size = new System.Drawing.Size(1452, 693);
+            this.Size = new System.Drawing.Size(726, 358);
             this.Resize += new System.EventHandler(this.Options_Resize);
             this.gExample.ResumeLayout(false);
             this.pError.ResumeLayout(false);
@@ -510,5 +522,6 @@
         private System.Windows.Forms.GroupBox gSyncColorsWithPrintForm;
         internal System.Windows.Forms.CheckBox cbSyncColorsWithPrintForm;
     internal System.Windows.Forms.CheckBox cbDontShowAsterisk;
+    private System.Windows.Forms.Button bReset;
   }
 }

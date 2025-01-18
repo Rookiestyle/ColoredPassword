@@ -21,6 +21,37 @@ namespace PluginTools
       return true;
     }
 
+    public static List<Delegate> GetEventHandlersOfStaticClass(this Type t, string EventName)
+    {
+      List<Delegate> result = new List<Delegate>();
+
+      object obj = null;
+      List<FieldInfo> event_fields = GetTypeEventFields(t);
+      EventHandlerList static_event_handlers = null;
+
+      foreach (FieldInfo fi in event_fields)
+      {
+        if (!CheckEvent(fi, EventName)) continue;
+
+        EventInfo ei = t.GetEvent(fi.Name, AllBindings);
+        if (ei == null)
+          ei = t.GetEvent(EventName, AllBindings);
+        if (ei == null)
+          ei = fi.DeclaringType.GetEvent(fi.Name, AllBindings);
+        if (ei == null)
+          ei = fi.DeclaringType.GetEvent(EventName, AllBindings);
+        if (ei != null)
+        {
+          object val = fi.GetValue(obj);
+          Delegate mdel = (val as Delegate);
+          if (mdel != null)
+            result.AddRange(mdel.GetInvocationList());
+        }
+      }
+      return result;
+
+    }
+
     public static List<Delegate> GetEventHandlers(this object obj, string EventName)
     {
       List<Delegate> result = new List<Delegate>();
@@ -78,6 +109,32 @@ namespace PluginTools
         }
       }
       return result;
+    }
+
+    public static void RemoveEventHandlersOfStaticClass(this Type t, string EventName, List<Delegate> handlers)
+    {
+      if (handlers == null) return;
+
+      object obj = null;
+      List<FieldInfo> event_fields = GetTypeEventFields(t);
+
+      foreach (FieldInfo fi in event_fields)
+      {
+        if (!CheckEvent(fi, EventName)) continue;
+
+        EventInfo ei = t.GetEvent(fi.Name, AllBindings);
+        if (ei == null)
+          ei = t.GetEvent(EventName, AllBindings);
+        if (ei == null)
+          ei = fi.DeclaringType.GetEvent(fi.Name, AllBindings);
+        if (ei == null)
+          ei = fi.DeclaringType.GetEvent(EventName, AllBindings);
+        if (ei != null)
+        {
+          foreach (Delegate del in handlers)
+            ei.RemoveEventHandler(obj, del);
+        }
+      }
     }
 
     public static void RemoveEventHandlers(this object obj, string EventName, List<Delegate> handlers)

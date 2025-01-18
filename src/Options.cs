@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-
+using KeePass.Resources;
 using PluginTranslation;
 
 namespace ColoredPassword
@@ -29,6 +29,7 @@ namespace ColoredPassword
       cbLowercase.Text = PluginTranslate.LowercaseDifferentColor;
       lDigits.Text = PluginTranslate.CharDigit;
       lSpecial.Text = PluginTranslate.CharSpecial;
+      bReset.Text = KPRes.Default;
 
       gExample.Text = PluginTranslate.Example;
 
@@ -94,6 +95,23 @@ namespace ColoredPassword
         }
       }
       if (PluginTools.Tools.KeePassVersion < ColorConfig.KP_2_51) gSyncColorsWithPrintForm.Enabled = false;
+    }
+
+    private void bReset_Click(object sender, EventArgs e)
+    {
+      var bSyncColorsWithPrintForm = ColorConfig.SyncColorsWithPrintForm;
+      ColorConfig.SyncColorsWithPrintForm = cbSyncColorsWithPrintForm.Checked;
+      ColorConfig.Reset();
+      ColorConfig.SyncColorsWithPrintForm = bSyncColorsWithPrintForm;
+      bForeColorDefault.BackColor = ColorConfig.ForeColorDefault;
+      bBackColorDefault.BackColor = ColorConfig.BackColorDefault;
+      bForeColorDigit.BackColor = ColorConfig.ForeColorDigit;
+      bBackColorDigit.BackColor = ColorConfig.BackColorDigit;
+      bForeColorSpecial.BackColor = ColorConfig.ForeColorSpecial;
+      bBackColorSpecial.BackColor = ColorConfig.BackColorSpecial;
+      bForeColorLower.BackColor = ColorConfig.ForeColorLower;
+      bBackColorLower.BackColor = ColorConfig.BackColorLower;
+      ctbExample.ColorText();
     }
   }
 }

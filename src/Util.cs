@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using KeePass.App.Configuration;
 using KeePass.Plugins;
 using KeePassLib;
@@ -173,23 +174,66 @@ namespace ColoredPassword
       bool test = Testmode;
       Testmode = false;
       const string ConfigPrefix = "ColoredPassword.";
+      Dictionary<string, string> dPrintColors = new Dictionary<string, string>();
+      dPrintColors["ColorPU"] = "WindowText";
+      dPrintColors["ColorPL"] = "WindowText";
+      dPrintColors["ColorPD"] = "Red";
+      dPrintColors["ColorPO"] = "Green";
+      var lColorKeys = new List<string>( dPrintColors.Keys );
+      if (SyncColorsWithPrintForm && PluginTools.Tools.KeePassVersion >= ColorConfig.KP_2_51)
+      {
+        //values are hardcode in early versions
+        dPrintColors["ColorPU"] = "#0000ff"; // Color.FromArgb(0, 0, 255);
+        dPrintColors["ColorPL"] = "#000000"; // Color.FromArgb(0, 0, 0);
+        dPrintColors["ColorPD"] = "#008000"; // Color.FromArgb(0, 128, 0);
+        dPrintColors["ColorPO"] = "#c00000"; // Color.FromArgb(192, 0, 0);
+        var y = KeePass.Program.MainForm.GetType().Assembly.GetTypes().Where(x => x.FullName == "KeePass.App.Configuration.AcePrint").FirstOrDefault();
+        try
+        {
+          var c = y.GetConstructors()[0];
+          var o = c.Invoke(new object[] { });
+          foreach (var sKey in lColorKeys)
+          {
+            var p = o.GetType().GetProperty(sKey);
+            dPrintColors[sKey] = (string)p.GetValue(o, null);
+          }
+        }
+        catch { }
+      }
       FirstRun = m_Config.GetBool(ConfigPrefix + "FirstRun", true);
       Active = m_Config.GetBool(ConfigPrefix + "Active", true);
       ColorEntryView = m_Config.GetBool(ConfigPrefix + "ColorEntryView", true);
       ListViewKeepBackgroundColor = m_Config.GetBool(ConfigPrefix + "ListViewKeepBackgroundColor", true);
-      ForeColorDefault = GetConfigColor(ConfigPrefix + "ForeColorDefault", "WindowText");
+      ForeColorDefault = GetConfigColor(ConfigPrefix + "ForeColorDefault", dPrintColors["ColorPU"]);
       BackColorDefault = GetConfigColor(ConfigPrefix + "BackColorDefault", "Window");
-      ForeColorDigit = GetConfigColor(ConfigPrefix + "ForeColorDigit", "Red");
+      ForeColorDigit = GetConfigColor(ConfigPrefix + "ForeColorDigit", dPrintColors["ColorPD"]);
       BackColorDigit = GetConfigColor(ConfigPrefix + "BackColorDigit", "White");
-      ForeColorSpecial = GetConfigColor(ConfigPrefix + "ForeColorSpecial", "Green");
+      ForeColorSpecial = GetConfigColor(ConfigPrefix + "ForeColorSpecial", dPrintColors["ColorPO"]);
       BackColorSpecial = GetConfigColor(ConfigPrefix + "BackColorSpecial", "White");
       LowercaseDifferent = m_Config.GetBool(ConfigPrefix + "LowercaseDifferent", false);
-      ForeColorLower = GetConfigColor(ConfigPrefix + "ForeColorLower", ColorToName(ForeColorDefault));
+      ForeColorLower = GetConfigColor(ConfigPrefix + "ForeColorLower", dPrintColors["ColorPL"]); // ColorToName(ForeColorDefault));
       BackColorLower = GetConfigColor(ConfigPrefix + "BackColorLower", ColorToName(BackColorDefault));
       SinglePwDisplayActive = m_Config.GetBool(ConfigPrefix + "SinglePwDisplay", SinglePwDisplayActive);
       ColorPwGen = m_Config.GetBool(ConfigPrefix + "ColorPwGen", ColorPwGen);
       Testmode = test;
       Write();
+    }
+
+    public static void Reset()
+    {
+      bool test = Testmode;
+      Testmode = false;
+      const string ConfigPrefix = "ColoredPassword.";
+      m_Config.SetString(ConfigPrefix + "ForeColorDefault", null);
+      m_Config.SetString(ConfigPrefix + "BackColorDefault", null);
+      m_Config.SetString(ConfigPrefix + "ForeColorDigit", null);
+      m_Config.SetString(ConfigPrefix + "BackColorDigit", null);
+      m_Config.SetString(ConfigPrefix + "ForeColorSpecial", null);
+      m_Config.SetString(ConfigPrefix + "BackColorSpecial", null);
+      m_Config.SetString(ConfigPrefix + "ForeColorLower", null);
+      m_Config.SetString(ConfigPrefix + "BackColorLower", null);
+      Read();
+      Testmode = test;
     }
 
     public static void Write()
@@ -244,6 +288,14 @@ namespace ColoredPassword
     private static Color NameToColor(string c)
     {
       int argb = 0;
+      if (c.Length == 7 && c[0] == '#')
+      {
+        try
+        {
+          return ColorTranslator.FromHtml(c);
+        }
+        catch { }
+      }
       if (int.TryParse(c, out argb)) return Color.FromArgb(argb);
       return Color.FromName(c);
     }
