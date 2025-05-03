@@ -88,7 +88,7 @@ namespace ColoredPassword
       if (!Enabled) return;
       if (m_form == null) return;
 
-      UIUtil.ResetFocus(this, m_form);
+      if (this.Visible) UIUtil.ResetFocus(this, m_form);
       if (Name.Contains("Repeat"))
       {
         var c = Tools.GetControl(Name.Replace("Repeat", string.Empty), m_form);
@@ -141,7 +141,7 @@ namespace ColoredPassword
       if (TabStop) return;
       if (m_text == null) return;
       //UIUtil.SetFocus(m_text, GetForm(m_text), true); //Only availabe as of KeePass 2.42
-      UIUtil.SetFocus(m_text, GetForm(m_text));
+      if (m_text.Visible) UIUtil.SetFocus(m_text, GetForm(m_text));
       if (m_text.CanFocus) m_text.Focus();
       PluginDebug.AddInfo(Name + " Focus changed");
     }
@@ -257,7 +257,7 @@ namespace ColoredPassword
         if (m_text.Enabled && !m_text.ReadOnly)
         {
           //UIUtil.SetFocus(m_text, GetForm(m_text), true); //Only availabe as of KeePass 2.42
-          UIUtil.SetFocus(m_text, GetForm(m_text));
+          if (m_text.Visible) UIUtil.SetFocus(m_text, GetForm(m_text));
           if (m_text.CanFocus) m_text.Focus();
         }
         m_text.TextChanged += ColorTextChanged;
@@ -453,6 +453,12 @@ namespace ColoredPassword
       else PluginDebug.AddInfo(Name + " Color password", 0, lMsg.ToArray());
 
       Select(nCursorPos, 0); //restore cursor position
+    }
+
+    ~ColorTextBox()
+    {
+      if (m_ctx != null)
+        m_ctx.Detach();
     }
   }
 }

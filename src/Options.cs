@@ -41,14 +41,20 @@ namespace ColoredPassword
       cbColorEntryView.Text = PluginTranslate.ColorEntryView;
       cbColorEntryViewKeepBackgroundColor.Text = PluginTranslate.ColorEntryViewKeepBackgroundColor;
       cbSinglePwDisplay.Text = PluginTranslate.SinglePwDisplay;
-      cbColorPwGen.Text = PluginTranslate.ColorPwGenDisplay;
       var f = KeePass.Program.Translation.Forms.Find(x => x.FullName == "KeePass.Forms.PwGeneratorForm");
-      if (f != null && f.Window != null) gPasswordGenerator.Text = f.Window.Text;
+      if (f != null && f.Window != null) cbColorPwGen.Text = f.Window.Text;
+      else cbColorPwGen.Text = "Password Generator";
 
       gSyncColorsWithPrintForm.Text = KeePass.Resources.KPRes.Print;
       cbSyncColorsWithPrintForm.Text = PluginTranslate.SyncColors;
 
       cbDontShowAsterisk.Text = string.Format(PluginTranslate.DontShowAsterisks, KeePass.Resources.KPRes.HideUsingAsterisks);
+
+      cbKeyPromptForm.Text = KPRes.OpenDatabase;
+      cbKeyChangeForm.UseMnemonic = false;
+      cbKeyChangeForm.Text = KPRes.CreateMasterKey + " & " + KPRes.ChangeMasterKey;
+      cbPwEntryForm.Text = KPRes.EditEntry;
+      gActiveForms.Text = PluginTranslate.FormsUsingColoredPassword;
     }
 
     private void OnColorSelect(object sender, EventArgs e)

@@ -17,9 +17,31 @@ namespace ColoredPassword
     public static bool Active = true;
     public static bool ColorEntryView = true;
     public static bool SinglePwDisplayActive = true;
-    public static bool ColorPwGen = true;
 
     public static Version KP_2_51 = new Version(2, 51);
+
+    public static bool ActiveKeyPromptForm
+    {
+      get { return m_Config.GetBool("ColoredPassword.ActiveKeyPromptForm", true); }
+      set { m_Config.SetBool("ColoredPassword.ActiveKeyPromptForm", value); }
+    }
+    public static bool ActivePasswordGeneratorForm
+    {
+      get { return m_Config.GetBool("ColoredPassword.ActivePasswordGeneratorForm", true); }
+      set { m_Config.SetBool("ColoredPassword.ActivePasswordGeneratorForm", value); }
+    }
+
+    public static bool ActiveKeyChangeForm
+    {
+      get { return m_Config.GetBool("ColoredPassword.ActiveKeyChangeForm", true); }
+      set { m_Config.SetBool("ColoredPassword.ActiveKeyChangeForm", value); }
+    }
+
+    public static bool ActivePwEntryForm
+    {
+      get { return m_Config.GetBool("ColoredPassword.ActivePwEntryForm", true); }
+      set { m_Config.SetBool("ColoredPassword.ActivePwEntryForm", value); }
+    }
 
     public static bool SyncColorsWithPrintForm
     {
@@ -214,7 +236,6 @@ namespace ColoredPassword
       ForeColorLower = GetConfigColor(ConfigPrefix + "ForeColorLower", dPrintColors["ColorPL"]); // ColorToName(ForeColorDefault));
       BackColorLower = GetConfigColor(ConfigPrefix + "BackColorLower", ColorToName(BackColorDefault));
       SinglePwDisplayActive = m_Config.GetBool(ConfigPrefix + "SinglePwDisplay", SinglePwDisplayActive);
-      ColorPwGen = m_Config.GetBool(ConfigPrefix + "ColorPwGen", ColorPwGen);
       Testmode = test;
       Write();
     }
@@ -255,7 +276,6 @@ namespace ColoredPassword
       m_Config.SetString(ConfigPrefix + "ForeColorLower", ColorToName(ForeColorLower));
       m_Config.SetString(ConfigPrefix + "BackColorLower", ColorToName(BackColorLower));
       m_Config.SetBool(ConfigPrefix + "SinglePwDisplay", SinglePwDisplayActive);
-      m_Config.SetBool(ConfigPrefix + "ColorPwGen", ColorPwGen);
       Testmode = test;
     }
 

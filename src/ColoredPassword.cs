@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using KeePass.App.Configuration;
 using KeePass.Plugins;
 using KeePass.UI;
+using KeePass.Util;
 using KeePassLib;
 using KeePassLib.Utility;
 
@@ -386,7 +389,7 @@ namespace ColoredPassword
     {
       (sender as Form).Shown -= OnPwGeneratorFormShown;
       if (!ColorConfig.Active) return;
-      if (!ColorConfig.ColorPwGen) return;
+      if (!ColorConfig.ActivePasswordGeneratorForm) return;
       KeePass.Forms.PwGeneratorForm pg = sender as KeePass.Forms.PwGeneratorForm;
       TextBox tb = Tools.GetControl("m_tbPreview", pg) as TextBox;
       if (tb == null)
@@ -462,8 +465,11 @@ namespace ColoredPassword
       o.cbColorEntryViewKeepBackgroundColor.Checked = ColorConfig.ListViewKeepBackgroundColor;
       o.cbSyncColorsWithPrintForm.Checked = ColorConfig.SyncColorsWithPrintForm;
       o.cbSinglePwDisplay.Checked = ColorConfig.SinglePwDisplayActive;
-      o.cbColorPwGen.Checked = ColorConfig.ColorPwGen;
+      o.cbColorPwGen.Checked = ColorConfig.ActivePasswordGeneratorForm;
       o.cbDontShowAsterisk.Checked = ColorConfig.DontShowAsteriskForEmptyFields;
+      o.cbKeyPromptForm.Checked = ColorConfig.ActiveKeyPromptForm;
+      o.cbKeyChangeForm.Checked = ColorConfig.ActiveKeyChangeForm;
+      o.cbPwEntryForm.Checked = ColorConfig.ActivePwEntryForm;
       o.ctbExample.ColorText();
       ColorConfig.Testmode = true;
     }
@@ -492,8 +498,13 @@ namespace ColoredPassword
       ColorConfig.ListViewKeepBackgroundColor = o.cbColorEntryViewKeepBackgroundColor.Checked;
       ColorConfig.SyncColorsWithPrintForm = o.cbSyncColorsWithPrintForm.Checked;
       SinglePwDisplay.Enabled = ColorConfig.SinglePwDisplayActive = o.cbSinglePwDisplay.Checked;
-      ColorConfig.ColorPwGen = o.cbColorPwGen.Checked;
+      ColorConfig.ActivePasswordGeneratorForm = o.cbColorPwGen.Checked;
       ColorConfig.DontShowAsteriskForEmptyFields = o.cbDontShowAsterisk.Checked;
+
+      ColorConfig.ActiveKeyPromptForm = o.cbKeyPromptForm.Checked;
+      ColorConfig.ActiveKeyChangeForm = o.cbKeyChangeForm.Checked;
+      ColorConfig.ActivePwEntryForm = o.cbPwEntryForm.Checked;
+
       ColorConfig.Write();
       if (ColorConfig.Active) ColorPasswords(ColorConfig.Active);
     }
@@ -555,8 +566,22 @@ namespace ColoredPassword
       }
     }
 
-    private static object CreateCustomInstance()
+    private static bool IsFormInCallstack(string sFormname)
     {
+      var stStackTrace = new StackTrace();
+      var f = stStackTrace.GetFrames();
+      return stStackTrace.GetFrames().FirstOrDefault(x => x.GetMethod().
+        DeclaringType.Name.ToLowerInvariant().Contains(sFormname.ToLowerInvariant())) != null;
+    }
+    private static object CreateCustomInstance()
+    { 
+      if (IsFormInCallstack("IOConnectionForm")) return new SecureTextBoxEx();
+      if (!ColorConfig.ActiveKeyPromptForm && IsFormInCallstack("KeyPromptForm")) return new SecureTextBoxEx();
+      if (!ColorConfig.ActiveKeyChangeForm && IsFormInCallstack("KeyCreationForm")) return new SecureTextBoxEx();
+      if (!ColorConfig.ActiveKeyChangeForm && IsFormInCallstack("KeyCreateForm")) return new SecureTextBoxEx();
+      if (!ColorConfig.ActiveKeyChangeForm && IsFormInCallstack("KeyChangeForm")) return new SecureTextBoxEx();
+      if (!ColorConfig.ActivePwEntryForm && IsFormInCallstack("PwEntryForm")) return new SecureTextBoxEx();
+
       return new ColoredSecureTextBox();
     }
     #endregion

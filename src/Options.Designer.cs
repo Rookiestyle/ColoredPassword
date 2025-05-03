@@ -32,6 +32,7 @@
             this.cdSelect = new System.Windows.Forms.ColorDialog();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.gExample = new System.Windows.Forms.GroupBox();
+            this.bReset = new System.Windows.Forms.Button();
             this.ctbExample = new ColoredPassword.ColorTextBox();
             this.pError = new System.Windows.Forms.Panel();
             this.lError2 = new System.Windows.Forms.Label();
@@ -52,24 +53,26 @@
             this.bForeColorSpecial = new System.Windows.Forms.Button();
             this.bBackColorSpecial = new System.Windows.Forms.Button();
             this.tpAdvanced = new System.Windows.Forms.TabPage();
+            this.gActiveForms = new System.Windows.Forms.GroupBox();
+            this.cbPwEntryForm = new System.Windows.Forms.CheckBox();
+            this.cbKeyChangeForm = new System.Windows.Forms.CheckBox();
+            this.cbKeyPromptForm = new System.Windows.Forms.CheckBox();
             this.gSyncColorsWithPrintForm = new System.Windows.Forms.GroupBox();
             this.cbSyncColorsWithPrintForm = new System.Windows.Forms.CheckBox();
-            this.gPasswordGenerator = new System.Windows.Forms.GroupBox();
-            this.cbColorPwGen = new System.Windows.Forms.CheckBox();
             this.gEntryView = new System.Windows.Forms.GroupBox();
             this.cbDontShowAsterisk = new System.Windows.Forms.CheckBox();
             this.cbSinglePwDisplay = new System.Windows.Forms.CheckBox();
             this.cbColorEntryViewKeepBackgroundColor = new System.Windows.Forms.CheckBox();
             this.cbColorEntryView = new System.Windows.Forms.CheckBox();
-            this.bReset = new System.Windows.Forms.Button();
+            this.cbColorPwGen = new System.Windows.Forms.CheckBox();
             this.gExample.SuspendLayout();
             this.pError.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tpSettings.SuspendLayout();
             this.cgActive.SuspendLayout();
             this.tpAdvanced.SuspendLayout();
+            this.gActiveForms.SuspendLayout();
             this.gSyncColorsWithPrintForm.SuspendLayout();
-            this.gPasswordGenerator.SuspendLayout();
             this.gEntryView.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -88,6 +91,16 @@
             this.gExample.TabIndex = 4;
             this.gExample.TabStop = false;
             this.gExample.Text = "gExample";
+            // 
+            // bReset
+            // 
+            this.bReset.Location = new System.Drawing.Point(498, 22);
+            this.bReset.Name = "bReset";
+            this.bReset.Size = new System.Drawing.Size(166, 23);
+            this.bReset.TabIndex = 2;
+            this.bReset.Text = "Reset";
+            this.bReset.UseVisualStyleBackColor = true;
+            this.bReset.Click += new System.EventHandler(this.bReset_Click);
             // 
             // ctbExample
             // 
@@ -330,8 +343,8 @@
             // 
             // tpAdvanced
             // 
+            this.tpAdvanced.Controls.Add(this.gActiveForms);
             this.tpAdvanced.Controls.Add(this.gSyncColorsWithPrintForm);
-            this.tpAdvanced.Controls.Add(this.gPasswordGenerator);
             this.tpAdvanced.Controls.Add(this.gEntryView);
             this.tpAdvanced.Location = new System.Drawing.Point(4, 25);
             this.tpAdvanced.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
@@ -342,10 +355,58 @@
             this.tpAdvanced.Text = "Advanced";
             this.tpAdvanced.UseVisualStyleBackColor = true;
             // 
+            // gActiveForms
+            // 
+            this.gActiveForms.Controls.Add(this.cbColorPwGen);
+            this.gActiveForms.Controls.Add(this.cbPwEntryForm);
+            this.gActiveForms.Controls.Add(this.cbKeyChangeForm);
+            this.gActiveForms.Controls.Add(this.cbKeyPromptForm);
+            this.gActiveForms.Location = new System.Drawing.Point(2, 166);
+            this.gActiveForms.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gActiveForms.Name = "gActiveForms";
+            this.gActiveForms.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.gActiveForms.Size = new System.Drawing.Size(714, 119);
+            this.gActiveForms.TabIndex = 8;
+            this.gActiveForms.TabStop = false;
+            this.gActiveForms.Text = "Forms using ColoredPassword";
+            // 
+            // cbPwEntryForm
+            // 
+            this.cbPwEntryForm.AutoSize = true;
+            this.cbPwEntryForm.Location = new System.Drawing.Point(9, 62);
+            this.cbPwEntryForm.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.cbPwEntryForm.Name = "cbPwEntryForm";
+            this.cbPwEntryForm.Size = new System.Drawing.Size(108, 20);
+            this.cbPwEntryForm.TabIndex = 7;
+            this.cbPwEntryForm.Text = "PwEntryForm";
+            this.cbPwEntryForm.UseVisualStyleBackColor = true;
+            // 
+            // cbKeyChangeForm
+            // 
+            this.cbKeyChangeForm.AutoSize = true;
+            this.cbKeyChangeForm.Location = new System.Drawing.Point(9, 40);
+            this.cbKeyChangeForm.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.cbKeyChangeForm.Name = "cbKeyChangeForm";
+            this.cbKeyChangeForm.Size = new System.Drawing.Size(130, 20);
+            this.cbKeyChangeForm.TabIndex = 6;
+            this.cbKeyChangeForm.Text = "KeyChangeForm";
+            this.cbKeyChangeForm.UseVisualStyleBackColor = true;
+            // 
+            // cbKeyPromptForm
+            // 
+            this.cbKeyPromptForm.AutoSize = true;
+            this.cbKeyPromptForm.Location = new System.Drawing.Point(9, 18);
+            this.cbKeyPromptForm.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.cbKeyPromptForm.Name = "cbKeyPromptForm";
+            this.cbKeyPromptForm.Size = new System.Drawing.Size(126, 20);
+            this.cbKeyPromptForm.TabIndex = 5;
+            this.cbKeyPromptForm.Text = "KeyPromptForm";
+            this.cbKeyPromptForm.UseVisualStyleBackColor = true;
+            // 
             // gSyncColorsWithPrintForm
             // 
             this.gSyncColorsWithPrintForm.Controls.Add(this.cbSyncColorsWithPrintForm);
-            this.gSyncColorsWithPrintForm.Location = new System.Drawing.Point(2, 150);
+            this.gSyncColorsWithPrintForm.Location = new System.Drawing.Point(2, 112);
             this.gSyncColorsWithPrintForm.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gSyncColorsWithPrintForm.Name = "gSyncColorsWithPrintForm";
             this.gSyncColorsWithPrintForm.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
@@ -364,29 +425,6 @@
             this.cbSyncColorsWithPrintForm.TabIndex = 5;
             this.cbSyncColorsWithPrintForm.Text = "Sync with print form";
             this.cbSyncColorsWithPrintForm.UseVisualStyleBackColor = true;
-            // 
-            // gPasswordGenerator
-            // 
-            this.gPasswordGenerator.Controls.Add(this.cbColorPwGen);
-            this.gPasswordGenerator.Location = new System.Drawing.Point(2, 106);
-            this.gPasswordGenerator.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.gPasswordGenerator.Name = "gPasswordGenerator";
-            this.gPasswordGenerator.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.gPasswordGenerator.Size = new System.Drawing.Size(714, 44);
-            this.gPasswordGenerator.TabIndex = 6;
-            this.gPasswordGenerator.TabStop = false;
-            this.gPasswordGenerator.Text = "Password Generator";
-            // 
-            // cbColorPwGen
-            // 
-            this.cbColorPwGen.AutoSize = true;
-            this.cbColorPwGen.Location = new System.Drawing.Point(9, 18);
-            this.cbColorPwGen.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.cbColorPwGen.Name = "cbColorPwGen";
-            this.cbColorPwGen.Size = new System.Drawing.Size(230, 20);
-            this.cbColorPwGen.TabIndex = 5;
-            this.cbColorPwGen.Text = "Use colors in password generator";
-            this.cbColorPwGen.UseVisualStyleBackColor = true;
             // 
             // gEntryView
             // 
@@ -450,15 +488,16 @@
             this.cbColorEntryView.Text = "Color entry view";
             this.cbColorEntryView.UseVisualStyleBackColor = true;
             // 
-            // bReset
+            // cbColorPwGen
             // 
-            this.bReset.Location = new System.Drawing.Point(498, 22);
-            this.bReset.Name = "bReset";
-            this.bReset.Size = new System.Drawing.Size(166, 23);
-            this.bReset.TabIndex = 2;
-            this.bReset.Text = "Reset";
-            this.bReset.UseVisualStyleBackColor = true;
-            this.bReset.Click += new System.EventHandler(this.bReset_Click);
+            this.cbColorPwGen.AutoSize = true;
+            this.cbColorPwGen.Location = new System.Drawing.Point(9, 84);
+            this.cbColorPwGen.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.cbColorPwGen.Name = "cbColorPwGen";
+            this.cbColorPwGen.Size = new System.Drawing.Size(230, 20);
+            this.cbColorPwGen.TabIndex = 8;
+            this.cbColorPwGen.Text = "Use colors in password generator";
+            this.cbColorPwGen.UseVisualStyleBackColor = true;
             // 
             // Options
             // 
@@ -479,10 +518,10 @@
             this.cgActive.ResumeLayout(false);
             this.cgActive.PerformLayout();
             this.tpAdvanced.ResumeLayout(false);
+            this.gActiveForms.ResumeLayout(false);
+            this.gActiveForms.PerformLayout();
             this.gSyncColorsWithPrintForm.ResumeLayout(false);
             this.gSyncColorsWithPrintForm.PerformLayout();
-            this.gPasswordGenerator.ResumeLayout(false);
-            this.gPasswordGenerator.PerformLayout();
             this.gEntryView.ResumeLayout(false);
             this.gEntryView.PerformLayout();
             this.ResumeLayout(false);
@@ -501,8 +540,6 @@
 		private System.Windows.Forms.TabControl tabControl1;
 		private System.Windows.Forms.TabPage tpSettings;
 		private System.Windows.Forms.TabPage tpAdvanced;
-		private System.Windows.Forms.GroupBox gPasswordGenerator;
-		internal System.Windows.Forms.CheckBox cbColorPwGen;
 		private System.Windows.Forms.GroupBox gEntryView;
 		internal System.Windows.Forms.CheckBox cbSinglePwDisplay;
 		internal System.Windows.Forms.CheckBox cbColorEntryViewKeepBackgroundColor;
@@ -523,5 +560,10 @@
         internal System.Windows.Forms.CheckBox cbSyncColorsWithPrintForm;
     internal System.Windows.Forms.CheckBox cbDontShowAsterisk;
     private System.Windows.Forms.Button bReset;
+    private System.Windows.Forms.GroupBox gActiveForms;
+    internal System.Windows.Forms.CheckBox cbKeyPromptForm;
+    internal System.Windows.Forms.CheckBox cbPwEntryForm;
+    internal System.Windows.Forms.CheckBox cbKeyChangeForm;
+    internal System.Windows.Forms.CheckBox cbColorPwGen;
   }
 }

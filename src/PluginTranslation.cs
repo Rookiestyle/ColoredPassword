@@ -68,10 +68,6 @@ namespace PluginTranslation
     /// </summary>
     public static readonly string SinglePwDisplay = @"Single click password to unhide";
     /// <summary>
-    /// Color passwords in password generator
-    /// </summary>
-    public static readonly string ColorPwGenDisplay = @"Color passwords in password generator";
-    /// <summary>
     /// Snychronize font colors
     /// </summary>
     public static readonly string SyncColors = @"Snychronize font colors";
@@ -79,6 +75,10 @@ namespace PluginTranslation
     /// Don't show asterisks for empty fields if '{0}' is active
     /// </summary>
     public static readonly string DontShowAsterisks = @"Don't show asterisks for empty fields if '{0}' is active";
+    /// <summary>
+    /// Use ColoredPassword in following windows
+    /// </summary>
+    public static readonly string FormsUsingColoredPassword = @"Color passwords in following windows";
     #endregion
 
     #region NO changes in this area
