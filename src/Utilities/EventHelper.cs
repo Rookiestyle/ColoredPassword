@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Version 1.0
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
