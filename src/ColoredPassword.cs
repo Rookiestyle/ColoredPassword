@@ -31,6 +31,8 @@ namespace ColoredPassword
       Tools.DefaultCaption = PluginTranslate.PluginName;
       Tools.PluginURL = "https://github.com/rookiestyle/coloredpassword/";
 
+      KeeThemeStub.Init();
+
       m_menu = new ToolStripMenuItem(Tools.DefaultCaption + "...");
       m_menu.Image = SmallIcon;
       m_menu.Click += (o, e) => Tools.ShowOptions();
@@ -47,7 +49,7 @@ namespace ColoredPassword
       }
       else
         PluginDebug.AddError("m_lvEntries not found", 0);
-      ColorPasswords(ColorConfig.Active);
+      ColorPasswords(ColorConfig.Active, true);
 
       GlobalWindowManager.WindowAdded += OnWindowAdded;
 
@@ -60,7 +62,7 @@ namespace ColoredPassword
 
     private void OnUIStateUpdated(object sender, EventArgs e)
     {
-      if (!ColorConfig.DontShowAsteriskForEmptyFields) return;  
+      if (!ColorConfig.DontShowAsteriskForEmptyFields) return;
       Dictionary<int, CP_ColumnType> dHiddenColumns = new Dictionary<int, CP_ColumnType>();
       for (int i = 0; i < KeePass.Program.Config.MainWindow.EntryListColumns.Count; i++)
       {
@@ -120,19 +122,38 @@ namespace ColoredPassword
       {
         if (lv != null) lv.EndUpdate();
       }
-  }
+    }
 
-  private void MainWindow_FormLoadPost(object sender, EventArgs e)
+    private void MainWindow_FormLoadPost(object sender, EventArgs e)
     {
       m_host.MainWindow.FormLoadPost -= MainWindow_FormLoadPost;
+
+      KeeThemeStub.HookMenu(OnKeeThemeClick);
 
       ColorPasswords(ColorConfig.Active);
     }
 
+    private void OnKeeThemeClick(object sender, EventArgs e)
+    {
+      var m = sender as ToolStripMenuItem;
+      m.Click -= OnKeeThemeClick;
+      if (m.Checked && m_lvEntries != null) m_lvEntries.OwnerDraw = false;
+      m.AddEventHandlers("Click", m.Tag as List<Delegate>);
+      m.PerformClick();
+      ColorPasswords(ColorConfig.Active);
+    }
+
+
     private Color m_cBackgroundColor = Color.White;
     private void Lv_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
     {
-      e.DrawDefault = true;
+      if (_dEvents["DrawColumnHeader"].Count == 0)
+        e.DrawDefault = true;
+      else
+      {
+        foreach (var d in _dEvents["DrawColumnHeader"])
+          d.DynamicInvoke(sender, e);
+      }
       m_cBackgroundColor = UIUtil.GetAlternateColorEx(e.Header.ListView.BackColor);
     }
 
@@ -140,45 +161,35 @@ namespace ColoredPassword
     {
       AceColumn colPw = KeePass.Program.Config.MainWindow.FindColumn(AceColumnType.Password);
       string m = string.Empty;
+      bool bPasswordShown = true;
       if (((colPw == null) || colPw.HideWithAsterisks) && !SinglePwDisplay.PasswordShown(e.Item))
       {
         //Let the OS draw in case no other handlers exist
         //If other handlers exist, we pass their value for DrawDefault
-        e.DrawDefault = true;
         if (colPw == null) m = "Password column not found";
         else m = "Password column found, password hidden";
         List<string> lCol = new List<string>();
         foreach (var c in KeePass.Program.Config.MainWindow.EntryListColumns)
           lCol.Add(c.GetDisplayName());
         PluginDebug.AddInfo(m, 0, lCol.ToArray());
-        return;
+        bPasswordShown = false;
+      }
+      else
+      {
+        e.DrawDefault = false;
+        m = "Password column found, password shown";
+        PluginDebug.AddSuccess(m, 0);
+
+        if ((e.State & ListViewItemStates.Selected) != 0)
+          e.DrawFocusRectangle();
       }
       e.DrawDefault = false;
-      m = "Password column found, password shown";
-      PluginDebug.AddSuccess(m, 0);
-
-      if ((e.State & ListViewItemStates.Selected) != 0)
-        e.DrawFocusRectangle();
-    }
-
-    private static bool m_bKeeThemeInstalled = true;
-    private void CleanupKeeTheme()
-    {
-      if (!m_bKeeThemeInstalled) return;
-      m_bKeeThemeInstalled = Tools.GetLoadedPluginsName().ContainsKey("KeeTheme.KeeThemeExt");
-      if (!m_bKeeThemeInstalled)
-      {
-        PluginDebug.AddInfo("Disable KeeTheme.ListView_DrawSubItem", 0, new string[] { "KeeTheme not found" });
-        return;
-      }
-      var lv = Tools.GetControl("m_lvEntries");
-      var ehAll = lv.GetEventHandlers("DrawSubItem");
-      var ehKeeTheme = ehAll.Find(x => x.Target.GetType().FullName.Contains("KeeTheme"));
-      if (ehKeeTheme == null) return;
-      lv.RemoveEventHandlers("DrawSubItem", ehAll);
-      ehAll.Remove(ehKeeTheme);
-      lv.AddEventHandlers("DrawSubItem", ehAll);
-      PluginDebug.AddInfo("Disable KeeTheme.ListView_DrawSubItem", 0, new string[] { "Disabled" });
+      foreach(var d in _dEvents["DrawItem"])
+        d.DynamicInvoke(sender, e);
+      if (_dEvents["DrawItem"].Count == 0 && !bPasswordShown)
+        e.DrawDefault = true;
+      if (bPasswordShown)
+        e.DrawDefault = false;
     }
 
     private void Lv_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
@@ -186,13 +197,11 @@ namespace ColoredPassword
       /* Do not handle first column
 			 * First column references the ListView item and can/has to be drawn by the OS
 			*/
-      if (e.ColumnIndex == 0)
+      if (e.ColumnIndex == 0 && _dEvents["DrawSubItem"].Count == 0)
       {
         e.DrawDefault = true;
         return;
       }
-
-      CleanupKeeTheme();
 
       Color cItemForeground = e.Item.UseItemStyleForSubItems ? e.Item.ForeColor : e.SubItem.ForeColor;
       Color cItemBackground = e.Item.UseItemStyleForSubItems ? e.Item.BackColor : e.SubItem.BackColor;
@@ -201,13 +210,21 @@ namespace ColoredPassword
         //Only set defined alternate background color, if the default background color was not changed yet
         //This way, explicitly set background colors do have higher priority
         if (cItemBackground == e.Item.ListView.BackColor) cItemBackground = m_cBackgroundColor;
+        if (KeeThemeStub.Enabled) cItemBackground = KeeThemeStub.GetOddRowColor(cItemBackground);
       }
       Font fFont = e.Item.UseItemStyleForSubItems ? e.Item.Font : e.SubItem.Font;
 
       //Differentiate between different drawing modes
       if ((ColorConfig.DrawMode == ColorConfig.ListViewDrawMode.DrawPasswordOnly) && (e.Header.Text != KeePass.Resources.KPRes.Password))
       {
-        Lv_DrawSubItem_Standard(e, cItemBackground);
+        e.Item.BackColor = e.SubItem.BackColor = cItemBackground;
+        if (_dEvents["DrawSubItem"].Count == 0)
+          e.DrawDefault = true; 
+        else
+        {
+          foreach (var d in _dEvents["DrawSubItem"])
+            d.DynamicInvoke(sender, e);
+        }
         return;
       }
 
@@ -215,12 +232,21 @@ namespace ColoredPassword
       int iPaddingX = 3;
       int iPaddingY = 2;
 
-      if (e.Header.Text != KeePass.Resources.KPRes.Password)
+      if (e.Header.Text != KeePass.Resources.KPRes.Password || e.SubItem.Text == PwDefs.HiddenPassword)
       {
-        Lv_DrawSubItem_NoPassword(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
-        return;
+        e.Item.BackColor = e.SubItem.BackColor = cItemBackground;
+        if (_dEvents["DrawSubItem"].Count == 0)
+          e.DrawDefault = true; 
+        else
+        {
+          foreach (var d in _dEvents["DrawSubItem"])
+            d.DynamicInvoke(sender, e);
+        }
       }
-      else Lv_DrawSubItem_Password(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
+      else
+      {
+        Lv_DrawSubItem_Password(e, cItemForeground, cItemBackground, fFont, iPaddingX, iPaddingY);
+      }
     }
 
     private void Lv_DrawSubItem_Password(DrawListViewSubItemEventArgs e, Color cItemForeground, Color cItemBackground, Font fFont, int iPaddingX, int iPaddingY)
@@ -295,26 +321,6 @@ namespace ColoredPassword
         msg = "Color letter";
       }
       return msg;
-    }
-
-    private void Lv_DrawSubItem_NoPassword(DrawListViewSubItemEventArgs e, Color cItemForeground, Color cItemBackground, Font fFont, int iPaddingX, int iPaddingY)
-    {
-      e.DrawDefault = false; //Other plugins might have set this to true
-      string m = "m_lvEntries: Draw text for column '" + e.Header.Text + "'";
-      if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
-      StringFormat sf = StringFormat.GenericDefault;
-      sf.FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip;
-      sf.Trimming = StringTrimming.EllipsisCharacter;
-      Rectangle r = new Rectangle(e.Bounds.X + iPaddingX, e.Bounds.Y + iPaddingY, e.Bounds.Width - (2 * iPaddingX), e.Bounds.Height - (2 * iPaddingY));
-      e.Graphics.DrawString(e.SubItem.Text, fFont, new SolidBrush(cItemForeground), r, sf);
-    }
-
-    private void Lv_DrawSubItem_Standard(DrawListViewSubItemEventArgs e, Color cBackcolor)
-    {
-      e.Item.BackColor = e.SubItem.BackColor = cBackcolor;
-      e.DrawDefault = true;
-      string m = "m_lvEntries: Standard display for column '" + e.Header.Text + "'";
-      if (!PluginDebug.HasMessage(PluginDebug.LogLevelFlags.Info, m)) PluginDebug.AddInfo(m, 0);
     }
 
     #region Hook forms
@@ -511,46 +517,107 @@ namespace ColoredPassword
     #endregion
 
     #region Override SecureTextBoxEx with ColoredSecureTextBox
-    private void ColorPasswords(bool active)
+    Dictionary<string, List<Delegate>> _dEvents = new Dictionary<string, List<Delegate>>();
+    private void InitColorPasswords()
     {
-      if (!OverridePossible)
+
+    }
+    private void ColorPasswords(bool active, bool bInit = false)
+    {
+      if (bInit)
       {
-        PluginDebug.AddError("TypeOverride not possible");
-        return;
-      }
-      if (!KeePass.App.AppPolicy.Current.UnhidePasswords)
-      {
-        PluginDebug.AddError("Policy 'UnhidePasswords' does not allow unhiding passwords'");
-        return;
-      }
-      if (ColorConfig.ColorEntryView)
-      {
-        if (m_lvEntries != null)
+        if (!OverridePossible)
         {
-          m_lvEntries.OwnerDraw = active;
-          if (active)
-          {
-            m_lvEntries.DrawColumnHeader += Lv_DrawColumnHeader;
-            m_lvEntries.DrawItem += Lv_DrawItem;
-            m_lvEntries.DrawSubItem += Lv_DrawSubItem;
-          }
-          else
-          {
-            m_lvEntries.DrawColumnHeader -= Lv_DrawColumnHeader;
-            m_lvEntries.DrawItem -= Lv_DrawItem;
-            m_lvEntries.DrawSubItem -= Lv_DrawSubItem;
-          }
-          PluginDebug.AddInfo("m_lvEntries changed", "OwnerDraw: " + m_lvEntries.OwnerDraw.ToString(), "ColorPasswords active: " + active.ToString(), "Viewstyle: " + m_lvEntries.View.ToString());
+          PluginDebug.AddError("TypeOverride not possible");
+          return;
         }
+        if (!KeePass.App.AppPolicy.Current.UnhidePasswords)
+        {
+          PluginDebug.AddError("Policy 'UnhidePasswords' does not allow unhiding passwords'");
+          return;
+        }
+        if (active)
+          TypeOverridePool.Register(typeof(SecureTextBoxEx), CreateCustomInstance);
         else
-          PluginDebug.AddError("m_lvEntries cannot be changed");
+          TypeOverridePool.Unregister(typeof(SecureTextBoxEx));
+        if (!_dEvents.ContainsKey("DrawColumnHeader")) _dEvents["DrawColumnHeader"] = new List<Delegate>();
+        if (!_dEvents.ContainsKey("DrawItem")) _dEvents["DrawItem"] = new List<Delegate>();
+        if (!_dEvents.ContainsKey("DrawSubItem")) _dEvents["DrawSubItem"] = new List<Delegate>();
+      }
+      if (m_lvEntries == null) return;
+      if (bInit) return;
+      m_lvEntries.DrawColumnHeader -= Lv_DrawColumnHeader;
+      m_lvEntries.DrawItem -= Lv_DrawItem;
+      m_lvEntries.DrawSubItem -= Lv_DrawSubItem; 
+      if (active && ColorConfig.ColorEntryView)
+      {
+        m_lvEntries.OwnerDraw = true;
+        //We want to remove all other plugin's eventhandlers
+        //They will  be called by our own handlers if required
+        RestoreOtherEventHandlers();
+        GetOtherEventHandlers();
+        RemoveOtherEventHandlers();
+        m_lvEntries.DrawColumnHeader += Lv_DrawColumnHeader;
+        m_lvEntries.DrawItem += Lv_DrawItem;
+        m_lvEntries.DrawSubItem += Lv_DrawSubItem;
       }
       else
-        PluginDebug.AddInfo("ColorEntryView is disabled, check KeePass config file", 0);
-      if (active)
-        TypeOverridePool.Register(typeof(SecureTextBoxEx), CreateCustomInstance);
-      else
-        TypeOverridePool.Unregister(typeof(SecureTextBoxEx));
+      {
+        //We removed our eventhandlers, restore other ones
+        m_lvEntries.OwnerDraw = RestoreOtherEventHandlers() > 0 || KeeThemeStub.Installed;
+      }
+    }
+
+    private int RestoreOtherEventHandlers()
+    {
+      int i = 0;
+      foreach (var kvp in _dEvents)
+      {
+        try
+        {
+          m_lvEntries.AddEventHandlers(kvp.Key, kvp.Value);
+          i += kvp.Value.Count;
+          _dEvents[kvp.Key].Clear();
+        }
+        catch (Exception e)
+        {
+          PluginDebug.AddError(e.Message, 0);
+        }
+      }
+      return i;
+    }
+
+    private void GetOtherEventHandlers()
+    {
+      foreach (var e in _dEvents.Keys) {
+        if (_dEvents[e] == null) _dEvents[e] = new List<Delegate>();
+        _dEvents[e].Clear();
+        var lE = m_lvEntries.GetEventHandlers(e);
+        if (lE == null || lE.Count == 0) continue;
+        foreach(var d in lE)
+        {
+          var p = d.Method.GetParameters();
+          if (p == null || p.Length != 2) continue;
+          if (!p[1].ParameterType.FullName.Contains("Draw")) continue;
+          if (d.Target == this) continue;
+          _dEvents[e].Add(d);
+        }
+      }
+    }
+
+    private void RemoveOtherEventHandlers()
+    {
+      foreach (var kvp in _dEvents)
+      {
+        try
+        {
+          m_lvEntries.RemoveEventHandlers(kvp.Key, kvp.Value);
+        }
+        catch (Exception e)
+        {
+          PluginDebug.AddError(e.Message, 0);
+        }
+      }
     }
 
     public static bool OverridePossible
@@ -574,7 +641,7 @@ namespace ColoredPassword
         DeclaringType.Name.ToLowerInvariant().Contains(sFormname.ToLowerInvariant())) != null;
     }
     private static object CreateCustomInstance()
-    { 
+    {
       if (IsFormInCallstack("IOConnectionForm")) return new SecureTextBoxEx();
       if (!ColorConfig.ActiveKeyPromptForm && IsFormInCallstack("KeyPromptForm")) return new SecureTextBoxEx();
       if (!ColorConfig.ActiveKeyChangeForm && IsFormInCallstack("KeyCreationForm")) return new SecureTextBoxEx();

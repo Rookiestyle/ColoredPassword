@@ -68,7 +68,7 @@ namespace ColoredPassword
 
     private void M_text_ParentChanged(object sender, EventArgs e)
     {
-      m_bKeeTheme = (m_text.Parent != null) && m_text.Parent.GetType().FullName.Contains("KeeTheme");
+      m_bKeeTheme = KeeThemeStub.Enabled;
 
       //https://github.com/Rookiestyle/ColoredPassword/issues/11
       //

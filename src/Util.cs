@@ -162,11 +162,6 @@ namespace ColoredPassword
       }
     }
 
-    public static int ColorDifferenceThreshold
-    {
-      get { return (int)m_Config.GetLong("ColoredPassword.ColorDifferenceThreshold", 26); }
-    }
-
     //Some users manually change the config file
     //This might result in ugly error messages / plugin behaviour otherwise
     //cf. https://github.com/Rookiestyle/ColoredPassword/issues/17
