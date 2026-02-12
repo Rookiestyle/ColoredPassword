@@ -68,9 +68,9 @@ namespace PluginTranslation
     /// </summary>
     public static readonly string SinglePwDisplay = @"Single click password to unhide";
     /// <summary>
-    /// Snychronize font colors
+    /// Synchronize font colors
     /// </summary>
-    public static readonly string SyncColors = @"Snychronize font colors";
+    public static readonly string SyncColors = @"Synchronize font colors";
     /// <summary>
     /// Don't show asterisks for empty fields if '{0}' is active
     /// </summary>
