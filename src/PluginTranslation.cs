@@ -70,7 +70,7 @@ namespace PluginTranslation
     /// <summary>
     /// Snychronize font colors
     /// </summary>
-    public static readonly string SyncColors = @"Snychronize font colors";
+    public static readonly string SyncColors = @"Synchronize font colors";
     /// <summary>
     /// Don't show asterisks for empty fields if '{0}' is active
     /// </summary>
