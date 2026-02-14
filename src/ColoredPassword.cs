@@ -133,14 +133,21 @@ namespace ColoredPassword
       ColorPasswords(ColorConfig.Active);
     }
 
+    private bool m_bKeeThemeWasActiveAtLeastOnce = false;
     private void OnKeeThemeClick(object sender, EventArgs e)
     {
       var m = sender as ToolStripMenuItem;
       m.Click -= OnKeeThemeClick;
       if (m.Checked && m_lvEntries != null) m_lvEntries.OwnerDraw = false;
       m.AddEventHandlers("Click", m.Tag as List<Delegate>);
-      m.PerformClick();
+      //PerformClick will toggle the Checked attribute, don't do that...
+      //m.PerformClick();
+      foreach (Delegate d in m.Tag as List<Delegate>)
+      {
+        d.DynamicInvoke(sender, e);
+      }
       ColorPasswords(ColorConfig.Active);
+      m_bKeeThemeWasActiveAtLeastOnce = true;
     }
 
 
@@ -564,7 +571,7 @@ namespace ColoredPassword
       else
       {
         //We removed our eventhandlers, restore other ones
-        m_lvEntries.OwnerDraw = RestoreOtherEventHandlers() > 0 || KeeThemeStub.Installed;
+        m_lvEntries.OwnerDraw = RestoreOtherEventHandlers() > 0 || m_bKeeThemeWasActiveAtLeastOnce || KeeThemeStub.Enabled;
       }
     }
 
