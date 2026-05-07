@@ -361,7 +361,25 @@ namespace ColoredPassword
       if (cbe != null) SetColorButtonColor(cbe, ColorConfig.ForeColorSpecial);
 
       var mUpdateWebBrowser = fPrint.GetType().GetMethod("UpdateWebBrowser", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-      if (mUpdateWebBrowser != null) mUpdateWebBrowser.Invoke(fPrint, new object[] { false });
+      var p = mUpdateWebBrowser.GetParameters();
+      if (mUpdateWebBrowser != null)
+      {
+        try
+        {
+          mUpdateWebBrowser.Invoke(fPrint, new object[] { false });
+        }
+        catch (Exception ex1)
+        {
+          try
+          {
+            mUpdateWebBrowser.Invoke(fPrint, new object[] { false, true });
+          }
+          catch (Exception ex2)
+          {
+            Tools.ShowError(ex2.Message);
+          }
+        }
+      }
     }
 
     private void OnPrintFormClosed(object sender, FormClosedEventArgs e)
