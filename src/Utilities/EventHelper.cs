@@ -323,8 +323,11 @@ namespace PluginTools
         if (fHandler == null) fHandler = obj.GetType().GetField("_handler", AllBindings);
         if (fHandler == null) return;
         Delegate d = (Delegate)fHandler.GetValue(obj);
-        Delegate[] d2 = d.GetInvocationList();
-        lDel.AddRange(d2);
+        if (d != null)
+        {
+          Delegate[] d2 = d.GetInvocationList();
+          lDel.AddRange(d2);
+        }
       }
       catch { }
     }
